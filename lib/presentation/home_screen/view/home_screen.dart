@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
     return Scaffold(
-      backgroundColor: Color(0xffF6F6F6),
+      backgroundColor: const Color(0xffF6F6F6),
       appBar: AppBar(
         title: Text(
           "Work Board",
@@ -39,9 +39,14 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         forceMaterialTransparency: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout_outlined, size: 20),
-            onPressed: () => _logoutConfirmation(),
+          Column(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.logout_outlined, size: 20,color: Colors.black,),
+                onPressed: () => _logoutConfirmation(),
+
+              ),
+            ],
           ),
         ],
       ),
@@ -79,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 weight: FontWeight.w400,
                                 color: Colors.grey),
                           ),
-                          Divider(thickness: .2),
+                          const Divider(thickness: .25),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
