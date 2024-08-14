@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import intl package for date formatting
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,9 +23,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void fetchData() async {
-    await Provider.of<HomeController>(context, listen: false)
-        .fetchData(context);
+    await Provider.of<HomeController>(context, listen: false).fetchData(context);
   }
+
+  final Map<String, Color> _statusColors = {
+    'Not Started': Colors.grey,
+    'In Progress': Colors.blue,
+    'Review Pending': Colors.orange,
+    'Review Failed': Colors.red,
+    'Completed': Colors.green,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +46,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         forceMaterialTransparency: true,
         actions: [
-          Column(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.logout_outlined, size: 20,color: Colors.black,),
-                onPressed: () => _logoutConfirmation(),
-
-              ),
-            ],
+          IconButton(
+            icon: const Icon(
+              Icons.logout_outlined,
+              size: 20,
+              color: Colors.black,
+            ),
+            onPressed: () => logoutConfirmation(),
           ),
         ],
       ),
@@ -58,11 +64,14 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverList.separated(
                 itemCount: controller.taskModel.data?.data?.length ?? 0,
                 itemBuilder: (context, index) {
-                  DateTime? dueDate =
-                      controller.taskModel.data?.data?[index].dueDate;
+                  var task = controller.taskModel.data?.data?[index];
+                  DateTime? dueDate = task?.dueDate;
                   String formattedDate = dueDate != null
                       ? DateFormat('dd/MM/yyyy').format(dueDate)
                       : 'No Due Date';
+
+                  String currentStatus = task?.status ?? 'Not Started';
+                  Color currentColor = _statusColors[currentStatus] ?? Colors.grey;
 
                   return Card(
                     surfaceTintColor: Colors.white,
@@ -73,37 +82,37 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "${controller.taskModel.data?.data?[index].title}",
+                            task?.title ?? 'No Title',
                             style: GLTextStyles.openSans(
                                 size: 18, weight: FontWeight.w500),
                           ),
                           Text(
-                            "${controller.taskModel.data?.data?[index].project?.name}",
+                            task?.project?.name ?? 'No Project',
                             style: GLTextStyles.openSans(
                                 size: 16,
                                 weight: FontWeight.w400,
                                 color: Colors.grey),
                           ),
+                          SizedBox(height: size.width * .008),
+                          Row(
+                            children: [
+                              Text("assigned by  : ",
+                                  style: GLTextStyles.openSans(
+                                      size: 12,
+                                      weight: FontWeight.w400,
+                                      color: Colors.grey)),
+                              Text(
+                                  task?.assignedByUser?.name ?? 'Unknown',
+                                  style: GLTextStyles.openSans(
+                                      size: 13,
+                                      weight: FontWeight.w400,
+                                      color: Colors.black)),
+                            ],
+                          ),
                           const Divider(thickness: .25),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Assigned by",
-                                      style: GLTextStyles.openSans(
-                                          size: 12,
-                                          weight: FontWeight.w400,
-                                          color: Colors.grey)),
-                                  Text(
-                                      "${controller.taskModel.data?.data?[index].assignedByUser?.name}",
-                                      style: GLTextStyles.openSans(
-                                          size: 14,
-                                          weight: FontWeight.w400,
-                                          color: Colors.black)),
-                                ],
-                              ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -120,6 +129,66 @@ class _HomeScreenState extends State<HomeScreen> {
                                           weight: FontWeight.w400,
                                           color: Colors.black)),
                                 ],
+                              ),
+                              Container(
+                                height: size.width * .075,
+                                width: size.width * .26,
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(5),
+                                  ),
+                                  color: currentColor,
+                                ),
+                                child: Center(
+                                  child: PopupMenuButton<String>(
+                                    onSelected: (String value) {
+                                      final int taskId = task?.id ?? 0;
+                                      const String statusNote = 'Some Note';
+                                      controller.changeStatus(context, taskId, value, statusNote);
+
+                                      setState(() {
+                                        task?.status = value;
+                                      });
+                                    },
+                                    itemBuilder: (BuildContext context) {
+                                      return _statusColors.keys
+                                          .map((String status) {
+                                        return PopupMenuItem<String>(
+                                          value: status,
+                                          child: Container(
+                                            height: size.width * .075,
+                                            width: size.width * .24,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                              const BorderRadius.all(
+                                                Radius.circular(5),
+                                              ),
+                                              color: _statusColors[status],
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                status,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList();
+                                    },
+                                    child: Text(
+                                      currentStatus,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -138,24 +207,27 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _logout(BuildContext context) async {
+  Future<void> logout(BuildContext context) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.remove(AppConfig.token);
-    sharedPreferences.setBool(AppConfig.loggedIn, false);
+    await sharedPreferences.remove(AppConfig.token);
+    await sharedPreferences.setBool(AppConfig.loggedIn, false);
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),
-      (route) => false,
+          (route) => false,
     );
   }
 
-  void _logoutConfirmation() {
+  void logoutConfirmation() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm Logout'),
+          title: Text(
+            'Confirm Logout',
+            style: GLTextStyles.cabinStyle(size: 18),
+          ),
           content: const Text('Are you sure you want to log out?'),
           actions: <Widget>[
             TextButton(
@@ -165,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
-                await _logout(context);
+                await logout(context);
               },
               child: const Text('Confirm'),
             ),

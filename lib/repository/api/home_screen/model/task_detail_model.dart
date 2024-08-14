@@ -1,25 +1,25 @@
 // To parse this JSON data, do
 //
-//     final taskModel = taskModelFromJson(jsonString);
+//     final taskDetailModel = taskDetailModelFromJson(jsonString);
 
 import 'dart:convert';
 
-TaskModel taskModelFromJson(String str) => TaskModel.fromJson(json.decode(str));
+TaskDetailModel taskDetailModelFromJson(String str) => TaskDetailModel.fromJson(json.decode(str));
 
-String taskModelToJson(TaskModel data) => json.encode(data.toJson());
+String taskDetailModelToJson(TaskDetailModel data) => json.encode(data.toJson());
 
-class TaskModel {
+class TaskDetailModel {
   String? status;
   Data? data;
   dynamic message;
 
-  TaskModel({
+  TaskDetailModel({
     this.status,
     this.data,
     this.message,
   });
 
-  factory TaskModel.fromJson(Map<String, dynamic> json) => TaskModel(
+  factory TaskDetailModel.fromJson(Map<String, dynamic> json) => TaskDetailModel(
     status: json["status"],
     data: json["data"] == null ? null : Data.fromJson(json["data"]),
     message: json["message"],
@@ -33,74 +33,10 @@ class TaskModel {
 }
 
 class Data {
-  int? currentPage;
-  List<Datum>? data;
-  String? firstPageUrl;
-  int? from;
-  int? lastPage;
-  String? lastPageUrl;
-  List<Link>? links;
-  String? nextPageUrl;
-  String? path;
-  int? perPage;
-  dynamic prevPageUrl;
-  int? to;
-  int? total;
-
-  Data({
-    this.currentPage,
-    this.data,
-    this.firstPageUrl,
-    this.from,
-    this.lastPage,
-    this.lastPageUrl,
-    this.links,
-    this.nextPageUrl,
-    this.path,
-    this.perPage,
-    this.prevPageUrl,
-    this.to,
-    this.total,
-  });
-
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-    currentPage: json["current_page"],
-    data: json["data"] == null ? [] : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
-    firstPageUrl: json["first_page_url"],
-    from: json["from"],
-    lastPage: json["last_page"],
-    lastPageUrl: json["last_page_url"],
-    links: json["links"] == null ? [] : List<Link>.from(json["links"]!.map((x) => Link.fromJson(x))),
-    nextPageUrl: json["next_page_url"],
-    path: json["path"],
-    perPage: json["per_page"],
-    prevPageUrl: json["prev_page_url"],
-    to: json["to"],
-    total: json["total"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "current_page": currentPage,
-    "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
-    "first_page_url": firstPageUrl,
-    "from": from,
-    "last_page": lastPage,
-    "last_page_url": lastPageUrl,
-    "links": links == null ? [] : List<dynamic>.from(links!.map((x) => x.toJson())),
-    "next_page_url": nextPageUrl,
-    "path": path,
-    "per_page": perPage,
-    "prev_page_url": prevPageUrl,
-    "to": to,
-    "total": total,
-  };
-}
-
-class Datum {
   int? id;
   String? title;
   int? projectsId;
-  String? description;
+  dynamic description;
   dynamic startDate;
   dynamic endDate;
   DateTime? dueDate;
@@ -123,14 +59,14 @@ class Datum {
   DateTime? updatedAt;
   Project? project;
   List<dynamic>? checkLists;
-  AssignedByUser? assignedToUser;
   List<dynamic>? timeSpend;
+  AssignedByUser? assignedToUser;
   AssignedByUser? assignedByUser;
   AssignedByUser? reviewer;
   AssignedByUser? createdUser;
   AssignedByUser? updatedUser;
 
-  Datum({
+  Data({
     this.id,
     this.title,
     this.projectsId,
@@ -157,15 +93,15 @@ class Datum {
     this.updatedAt,
     this.project,
     this.checkLists,
-    this.assignedToUser,
     this.timeSpend,
+    this.assignedToUser,
     this.assignedByUser,
     this.reviewer,
     this.createdUser,
     this.updatedUser,
   });
 
-  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
     id: json["id"],
     title: json["title"],
     projectsId: json["projects_id"],
@@ -184,7 +120,7 @@ class Datum {
     archivedBy: json["archived_by"],
     archivedOn: json["archived_on"],
     priority: json["priority"],
-    status: json["status"], // or another default value
+    status: json["status"],
     statusNote: json["status_note"],
     createdBy: json["created_by"],
     updatedBy: json["updated_by"],
@@ -192,14 +128,13 @@ class Datum {
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
     project: json["project"] == null ? null : Project.fromJson(json["project"]),
     checkLists: json["check_lists"] == null ? [] : List<dynamic>.from(json["check_lists"]!.map((x) => x)),
-    assignedToUser: json["assigned_to_user"] == null ? null : AssignedByUser.fromJson(json["assigned_to_user"]),
     timeSpend: json["time_spend"] == null ? [] : List<dynamic>.from(json["time_spend"]!.map((x) => x)),
+    assignedToUser: json["assigned_to_user"] == null ? null : AssignedByUser.fromJson(json["assigned_to_user"]),
     assignedByUser: json["assigned_by_user"] == null ? null : AssignedByUser.fromJson(json["assigned_by_user"]),
     reviewer: json["reviewer"] == null ? null : AssignedByUser.fromJson(json["reviewer"]),
     createdUser: json["created_user"] == null ? null : AssignedByUser.fromJson(json["created_user"]),
     updatedUser: json["updated_user"] == null ? null : AssignedByUser.fromJson(json["updated_user"]),
   );
-
 
   Map<String, dynamic> toJson() => {
     "id": id,
@@ -228,8 +163,8 @@ class Datum {
     "updated_at": updatedAt?.toIso8601String(),
     "project": project?.toJson(),
     "check_lists": checkLists == null ? [] : List<dynamic>.from(checkLists!.map((x) => x)),
-    "assigned_to_user": assignedToUser?.toJson(),
     "time_spend": timeSpend == null ? [] : List<dynamic>.from(timeSpend!.map((x) => x)),
+    "assigned_to_user": assignedToUser?.toJson(),
     "assigned_by_user": assignedByUser?.toJson(),
     "reviewer": reviewer?.toJson(),
     "created_user": createdUser?.toJson(),
@@ -243,7 +178,7 @@ class AssignedByUser {
   String? email;
   String? username;
   dynamic emailVerifiedAt;
-  UserType? userType;
+  String? userType;
   int? managerId;
   int? parantOrganisationsId;
   int? organisationsId;
@@ -251,12 +186,12 @@ class AssignedByUser {
   String? apiToken;
   int? loggedinOrganisation;
   int? lastAccessedProjectsId;
-  String? facebookUrl;
-  String? linkedinUrl;
-  String? instagramUrl;
-  String? blogUrl;
+  dynamic facebookUrl;
+  dynamic linkedinUrl;
+  dynamic instagramUrl;
+  dynamic blogUrl;
   dynamic lastUsedEmail;
-  String? reportingEmail;
+  dynamic reportingEmail;
   int? status;
   int? createdBy;
   int? updatedBy;
@@ -296,7 +231,7 @@ class AssignedByUser {
     email: json["email"],
     username: json["username"],
     emailVerifiedAt: json["email_verified_at"],
-    userType: userTypeValues.map[json["user_type"]]!,
+    userType: json["user_type"],
     managerId: json["manager_id"],
     parantOrganisationsId: json["parant_organisations_id"],
     organisationsId: json["organisations_id"],
@@ -323,7 +258,7 @@ class AssignedByUser {
     "email": email,
     "username": username,
     "email_verified_at": emailVerifiedAt,
-    "user_type": userTypeValues.reverse[userType],
+    "user_type": userType,
     "manager_id": managerId,
     "parant_organisations_id": parantOrganisationsId,
     "organisations_id": organisationsId,
@@ -345,33 +280,20 @@ class AssignedByUser {
   };
 }
 
-enum UserType {
-  ADMIN,
-  EMPLOYEE,
-  USER
-}
-
-final userTypeValues = EnumValues({
-  "Admin": UserType.ADMIN,
-  "Employee": UserType.EMPLOYEE,
-  "User": UserType.USER
-});
-
 class Project {
   int? id;
   String? name;
   dynamic leadsId;
   int? accountsId;
-  int? countryId;
+  dynamic countryId;
   DateTime? startDate;
   dynamic endDate;
-  String? description;
+  dynamic description;
   int? status;
   int? createdBy;
   int? updatedBy;
   DateTime? createdAt;
   DateTime? updatedAt;
-  List<Member>? members;
 
   Project({
     this.id,
@@ -387,7 +309,6 @@ class Project {
     this.updatedBy,
     this.createdAt,
     this.updatedAt,
-    this.members,
   });
 
   factory Project.fromJson(Map<String, dynamic> json) => Project(
@@ -404,7 +325,6 @@ class Project {
     updatedBy: json["updated_by"],
     createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
-    members: json["members"] == null ? [] : List<Member>.from(json["members"]!.map((x) => Member.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -421,94 +341,5 @@ class Project {
     "updated_by": updatedBy,
     "created_at": createdAt?.toIso8601String(),
     "updated_at": updatedAt?.toIso8601String(),
-    "members": members == null ? [] : List<dynamic>.from(members!.map((x) => x.toJson())),
   };
-}
-
-class Member {
-  int? id;
-  int? projectsId;
-  int? usersId;
-  String? userRole;
-  int? isProjectOwner;
-  int? createdBy;
-  int? updatedBy;
-  DateTime? createdAt;
-  DateTime? updatedAt;
-  AssignedByUser? user;
-
-  Member({
-    this.id,
-    this.projectsId,
-    this.usersId,
-    this.userRole,
-    this.isProjectOwner,
-    this.createdBy,
-    this.updatedBy,
-    this.createdAt,
-    this.updatedAt,
-    this.user,
-  });
-
-  factory Member.fromJson(Map<String, dynamic> json) => Member(
-    id: json["id"],
-    projectsId: json["projects_id"],
-    usersId: json["users_id"],
-    userRole: json["user_role"],
-    isProjectOwner: json["is_project_owner"],
-    createdBy: json["created_by"],
-    updatedBy: json["updated_by"],
-    createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
-    updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
-    user: json["user"] == null ? null : AssignedByUser.fromJson(json["user"]),
-  );
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "projects_id": projectsId,
-    "users_id": usersId,
-    "user_role": userRole,
-    "is_project_owner": isProjectOwner,
-    "created_by": createdBy,
-    "updated_by": updatedBy,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-    "user": user?.toJson(),
-  };
-}
-
-class Link {
-  String? url;
-  String? label;
-  bool? active;
-
-  Link({
-    this.url,
-    this.label,
-    this.active,
-  });
-
-  factory Link.fromJson(Map<String, dynamic> json) => Link(
-    url: json["url"],
-    label: json["label"],
-    active: json["active"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "url": url,
-    "label": label,
-    "active": active,
-  };
-}
-
-class EnumValues<T> {
-  Map<String, T> map;
-  late Map<T, String> reverseMap;
-
-  EnumValues(this.map);
-
-  Map<T, String> get reverse {
-    reverseMap = map.map((k, v) => MapEntry(v, k));
-    return reverseMap;
-  }
 }

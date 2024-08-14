@@ -15,21 +15,22 @@ class HomeService {
     } catch (e) {
       log("$e");
     }
+    return {};
   }
 
-  static Future<dynamic> fetchTasks({required int page}) async {
-    log("HomeService -> fetchTasks(page: $page)");
+  static Future<dynamic> changeStatus(
+      int id, String status, String? note) async {
+    log("HomeService -> changeStatus()");
     try {
-      var nextPage =
-          "https://dashboard.omnisellcrm.com/api/projects/tasks?page=$page";
-      var decodedData = await ApiHelper.getDataWObaseUrl(
-        endPoint: nextPage,
+      var decodedData = await ApiHelper.getData(
+        endPoint:
+            "projects/tasks/change-status?task_id=$id&status=$status&status_note=$note",
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData;
     } catch (e) {
       log("$e");
-      throw Exception('Failed to fetch tasks');
     }
+    return {};
   }
 }

@@ -26,6 +26,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        popupMenuTheme: const PopupMenuThemeData(
+          elevation: 0,
+          color: Colors.white70,
+        ),
+      ),
       debugShowCheckedModeBanner: false,
       home: isLoggedIn ? const HomeScreen() : const LoginScreen(),
     );
