@@ -16,11 +16,11 @@ class HomeController extends ChangeNotifier {
   bool isStatusLoading = false;
   bool isStatusViewLoading = false;
 
-  fetchData(context) async {
+  fetchData(context, userId) async {
     isLoading = true;
     notifyListeners();
     log("HomeController -> fetchData()");
-    HomeService.fetchData().then((value) {
+    HomeService.fetchData(userId).then((value) {
       if (value != null && value["status"] == "success") {
         taskModel = TaskModel.fromJson(value);
         isLoading = false;

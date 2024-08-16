@@ -4,11 +4,11 @@ import '../../../../core/utils/app_utils.dart';
 import '../../../helper/api_helper.dart';
 
 class HomeService {
-  static Future<dynamic> fetchData() async {
+  static Future<dynamic> fetchData(userId) async {
     log("HomeService -> fetchData()");
     try {
       var decodedData = await ApiHelper.getData(
-        endPoint: "projects/tasks",
+        endPoint: "projects/tasks?assigned_to=$userId",
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData;

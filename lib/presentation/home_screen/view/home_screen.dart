@@ -1,7 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/view/widgets/task_detail_bottom_sheet.dart';
-import 'package:omnisell_worksportal/presentation/task_detail_screen/view/task_detail_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,7 +12,9 @@ import '../../login_screen/view/login_screen.dart';
 import '../controller/home_controller.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, required this.userId});
+  final int userId;
+
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -26,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void fetchData() async {
     await Provider.of<HomeController>(context, listen: false)
-        .fetchData(context);
+        .fetchData(context,widget.userId);
   }
 
   final Map<String, Color> _statusColors = {
@@ -277,6 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () async {
                 Navigator.of(context).pop();
                 await logout(context);
+                log("logged out");
               },
               child: const Text('Confirm'),
             ),

@@ -20,9 +20,15 @@ class LoginController extends ChangeNotifier {
         log("token -> ${value["data"]["auth_token"]} ");
         storeLoginData(value);
         storeUserToken(value["data"]["auth_token"]);
+        final int userId = value["data"]["user"]["user_id"];
+        log("userId -> $userId");
+        storeUserId(userId);
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) =>  HomeScreen()),
+            MaterialPageRoute(
+                builder: (context) => HomeScreen(
+                      userId: userId,
+                    )),
             (route) => false);
       } else {
         log("Else Condition >> Api failed");
@@ -44,9 +50,15 @@ class LoginController extends ChangeNotifier {
   }
 
   void storeUserToken(resData) async {
-    log("storeUserToken");
+    log("storeUserToken()");
     sharedPreferences = await SharedPreferences.getInstance();
     String dataUser = json.encode(resData);
     sharedPreferences.setString(AppConfig.token, dataUser);
+  }
+
+  Future<void> storeUserId(int userId) async {
+    log("storeUserId()");
+    sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setInt(AppConfig.userId, userId);
   }
 }
