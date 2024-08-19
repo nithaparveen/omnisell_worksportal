@@ -5,13 +5,14 @@ class TaskDetailBottomSheet extends StatelessWidget {
   final String projectName;
   final String assignedBy;
   final String dueDate;
-  final String status;
+  String status; // Make status mutable
   final Color statusColor;
   final String priority;
   final String reviewer;
   final String description;
+  final Function(String) onStatusChange; // Callback for status change
 
-  const TaskDetailBottomSheet({
+  TaskDetailBottomSheet({
     super.key,
     required this.title,
     required this.projectName,
@@ -22,7 +23,16 @@ class TaskDetailBottomSheet extends StatelessWidget {
     required this.priority,
     required this.reviewer,
     required this.description,
+    required this.onStatusChange, // Accept callback for status change
   });
+
+  final Map<String, Color> _statusColors = {
+    'Not Started': Colors.grey,
+    'In Progress': Colors.blue,
+    'Review Pending': Colors.orange,
+    'Review Failed': Colors.red,
+    'Completed': Colors.green,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -152,20 +162,53 @@ class TaskDetailBottomSheet extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Container(
-                      height: 30,
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: statusColor,
-                      ),
-                      child: Center(
-                        child: Text(
-                          status,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
+                    PopupMenuButton<String>(
+                      onSelected: (String newStatus) {
+                        onStatusChange(newStatus); // Invoke callback
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return _statusColors.keys.map((String status) {
+                          return PopupMenuItem<String>(
+                            value: status,
+                            child: Container(
+                              margin: const EdgeInsetsDirectional.all(5),
+                              height: 30,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                                color: _statusColors[status],
+                              ),
+                              child: Center(
+                                child: Text(
+                                  status,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList();
+                      },
+                      child: Container(
+                        height: 30,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: statusColor,
+                        ),
+                        child: Center(
+                          child: Text(
+                            status,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),

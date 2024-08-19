@@ -95,6 +95,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             priority: getPriorityLabel(task?.priority ?? 0),
                             reviewer: task?.reviewer?.name ?? 'Unknown',
                             description: cleanDescription(task?.description ?? ''),
+                            onStatusChange: (String newStatus) {
+                              final int taskId = task?.id ?? 0;
+                              const String statusNote = 'Some Note';
+                              controller.changeStatus(context, taskId, newStatus, statusNote);
+                              setState(() {
+                                task?.status = newStatus;
+                              });
+                              Navigator.pop(context);
+                            },
                           );
                         },
                         shape: const RoundedRectangleBorder(
@@ -160,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                                 Container(
-                                  height: size.width * .075,
+                                  height: size.width * .055,
                                   width: size.width * .26,
                                   decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(
@@ -185,6 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           return PopupMenuItem<String>(
                                             value: status,
                                             child: Container(
+                                              margin: const EdgeInsetsDirectional.all(5),
                                               height: size.width * .075,
                                               width: size.width * .24,
                                               decoration: BoxDecoration(
