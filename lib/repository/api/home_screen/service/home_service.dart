@@ -4,11 +4,16 @@ import '../../../../core/utils/app_utils.dart';
 import '../../../helper/api_helper.dart';
 
 class HomeService {
-  static Future<dynamic> fetchData(userId) async {
+  static Future<dynamic> fetchData(int userId, {String? status}) async {
     log("HomeService -> fetchData()");
     try {
+      String endPoint = "projects/tasks?assigned_to=$userId";
+      if (status != null && status.isNotEmpty) {
+        endPoint += "&status=$status";
+      }
+
       var decodedData = await ApiHelper.getData(
-        endPoint: "projects/tasks?assigned_to=$userId",
+        endPoint: endPoint,
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData;
@@ -24,7 +29,7 @@ class HomeService {
     try {
       var decodedData = await ApiHelper.getData(
         endPoint:
-            "projects/tasks/change-status?task_id=$id&status=$status&status_note=$note",
+        "projects/tasks/change-status?task_id=$id&status=$status&status_note=${Uri.encodeComponent(note ?? '')}",
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData;

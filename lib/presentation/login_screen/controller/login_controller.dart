@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../app_config/app_config.dart';
+import '../../../core/constants/colors.dart';
+import '../../../core/utils/app_utils.dart';
 import '../../../repository/api/login_screen/service/login_service.dart';
+import '../../bottom_navigation_screen/view/bottom_navigation_screen.dart';
 import '../../home_screen/view/home_screen.dart';
 
 class LoginController extends ChangeNotifier {
@@ -23,14 +26,16 @@ class LoginController extends ChangeNotifier {
         final int userId = value["data"]["user"]["user_id"];
         log("userId -> $userId");
         storeUserId(userId);
+        AppUtils.oneTimeSnackBar("LoggedIn Successfully", context: context, bgColor: ColorTheme.green);
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-                builder: (context) => HomeScreen(
+                builder: (context) => StatusNavigationBar(
                       userId: userId,
                     )),
             (route) => false);
       } else {
+        AppUtils.oneTimeSnackBar("Password mismatch", context: context, bgColor: ColorTheme.red);
         log("Else Condition >> Api failed");
       }
     });

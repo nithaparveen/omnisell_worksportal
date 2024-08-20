@@ -1,38 +1,48 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/view/widgets/task_detail_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../app_config/app_config.dart';
 import '../../../core/constants/textstyles.dart';
+import '../../../global_widget/global_appbar.dart';
 import '../../login_screen/view/login_screen.dart';
 import '../controller/home_controller.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.userId});
-  final int userId;
+  const HomeScreen({super.key, required this.userId, this.statusFilter});
 
+  final int userId;
+  final String? statusFilter;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late HomeController _homeController;
+
   @override
   void initState() {
     super.initState();
-    fetchData();
+    _homeController = Provider.of<HomeController>(context, listen: false);
+    _homeController.setUserId(widget.userId);
+    _fetchData();
   }
 
-  void fetchData() async {
-    await Provider.of<HomeController>(context, listen: false)
-        .fetchData(context,widget.userId);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _fetchData();
   }
 
-  final Map<String, Color> _statusColors = {
+  void _fetchData() async {
+    String statusFilter = widget.statusFilter ?? '';
+    await _homeController.fetchTasksByStatus(context, statusFilter);
+  }
+
+  final Map<String, Color> statusColors = {
     'Not Started': Colors.grey,
     'In Progress': Colors.blue,
     'Review Pending': Colors.orange,
@@ -42,15 +52,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.sizeOf(context);
+    var size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: const Color(0xffF6F6F6),
-      appBar: AppBar(
-        title: Text(
-          "Work Board",
-          style: GLTextStyles.cabinStyle(size: 22),
-        ),
-        forceMaterialTransparency: true,
+      appBar: GLAppBar(
+        title: "Work Board",
         actions: [
           IconButton(
             icon: const Icon(
@@ -58,60 +65,49 @@ class _HomeScreenState extends State<HomeScreen> {
               size: 20,
               color: Colors.black,
             ),
-            onPressed: () => logoutConfirmation(),
+            onPressed: _showLogoutConfirmation,
           ),
         ],
       ),
       body: Consumer<HomeController>(builder: (context, controller, _) {
+        var filteredTasks = controller.taskModel.data?.data?.where((task) {
+              return widget.statusFilter == null ||
+                  task.status == widget.statusFilter;
+            }).toList() ??
+            [];
+
+        if (controller.isLoading) {
+          return const Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.white,
+              color: Colors.grey,
+            ),
+          );
+        }
+
+        if (filteredTasks.isEmpty) {
+          return const Center(child: Text("No tasks available"));
+        }
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: CustomScrollView(
             slivers: [
               SliverList.separated(
-                itemCount: controller.taskModel.data?.data?.length ?? 0,
+                itemCount: filteredTasks.length,
                 itemBuilder: (context, index) {
-                  var task = controller.taskModel.data?.data?[index];
-                  DateTime? dueDate = task?.dueDate;
+                  var task = filteredTasks[index];
+                  DateTime? dueDate = task.dueDate;
                   String formattedDate = dueDate != null
                       ? DateFormat('dd/MM/yyyy').format(dueDate)
                       : 'No Due Date';
 
-                  String currentStatus = task?.status ?? 'Not Started';
+                  String currentStatus = task.status ?? 'Not Started';
                   Color currentColor =
-                      _statusColors[currentStatus] ?? Colors.grey;
+                      statusColors[currentStatus] ?? Colors.grey;
 
                   return InkWell(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return TaskDetailBottomSheet(
-                            title: task?.title ?? 'No Title',
-                            projectName: task?.project?.name ?? 'No Project',
-                            assignedBy: task?.assignedByUser?.name ?? 'Unknown',
-                            dueDate: formattedDate,
-                            status: currentStatus,
-                            statusColor: currentColor,
-                            priority: getPriorityLabel(task?.priority ?? 0),
-                            reviewer: task?.reviewer?.name ?? 'Unknown',
-                            description: cleanDescription(task?.description ?? ''),
-                            onStatusChange: (String newStatus) {
-                              final int taskId = task?.id ?? 0;
-                              const String statusNote = 'Some Note';
-                              controller.changeStatus(context, taskId, newStatus, statusNote);
-                              setState(() {
-                                task?.status = newStatus;
-                              });
-                              Navigator.pop(context);
-                            },
-                          );
-                        },
-                        shape: const RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(15)),
-                        ),
-                      );
-                    },
+                    onTap: () =>
+                        _showTaskDetailBottomSheet(context, task, currentColor),
                     child: Card(
                       surfaceTintColor: Colors.white,
                       elevation: 1,
@@ -121,12 +117,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              task?.title ?? 'No Title',
+                              task.title ?? 'No Title',
                               style: GLTextStyles.openSans(
                                   size: 18, weight: FontWeight.w500),
                             ),
                             Text(
-                              task?.project?.name ?? 'No Project',
+                              task.project?.name ?? 'No Project',
                               style: GLTextStyles.openSans(
                                   size: 16,
                                   weight: FontWeight.w400,
@@ -135,16 +131,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             SizedBox(height: size.width * .008),
                             Row(
                               children: [
-                                Text("assigned by  : ",
-                                    style: GLTextStyles.openSans(
-                                        size: 12,
-                                        weight: FontWeight.w400,
-                                        color: Colors.grey)),
-                                Text(task?.assignedByUser?.name ?? 'Unknown',
-                                    style: GLTextStyles.openSans(
-                                        size: 13,
-                                        weight: FontWeight.w400,
-                                        color: Colors.black)),
+                                Text(
+                                  "assigned by: ",
+                                  style: GLTextStyles.openSans(
+                                      size: 12,
+                                      weight: FontWeight.w400,
+                                      color: Colors.grey),
+                                ),
+                                Text(
+                                  task.assignedByUser?.name ?? 'Unknown',
+                                  style: GLTextStyles.openSans(
+                                      size: 13,
+                                      weight: FontWeight.w400,
+                                      color: Colors.black),
+                                ),
                               ],
                             ),
                             const Divider(thickness: .25),
@@ -161,11 +161,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                           weight: FontWeight.w400,
                                           color: Colors.grey),
                                     ),
-                                    Text(formattedDate,
-                                        style: GLTextStyles.openSans(
-                                            size: 14,
-                                            weight: FontWeight.w400,
-                                            color: Colors.black)),
+                                    Text(
+                                      formattedDate,
+                                      style: GLTextStyles.openSans(
+                                          size: 14,
+                                          weight: FontWeight.w400,
+                                          color: Colors.black),
+                                    ),
                                   ],
                                 ),
                                 Container(
@@ -173,36 +175,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: size.width * .26,
                                   decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(
-                                      Radius.circular(5),
-                                    ),
+                                        Radius.circular(5)),
                                     color: currentColor,
                                   ),
                                   child: Center(
                                     child: PopupMenuButton<String>(
-                                      onSelected: (String value) {
-                                        final int taskId = task?.id ?? 0;
-                                        const String statusNote = 'Some Note';
-                                        controller.changeStatus(
-                                            context, taskId, value, statusNote);
-                                        setState(() {
-                                          task?.status = value;
-                                        });
-                                      },
+                                      onSelected: (String value) =>
+                                          _onStatusSelected(
+                                              context, task, value),
                                       itemBuilder: (BuildContext context) {
-                                        return _statusColors.keys
+                                        return statusColors.keys
                                             .map((String status) {
                                           return PopupMenuItem<String>(
                                             value: status,
                                             child: Container(
-                                              margin: const EdgeInsetsDirectional.all(5),
+                                              margin:
+                                                  const EdgeInsetsDirectional
+                                                      .all(5),
                                               height: size.width * .075,
                                               width: size.width * .24,
                                               decoration: BoxDecoration(
                                                 borderRadius:
                                                     const BorderRadius.all(
-                                                  Radius.circular(5),
-                                                ),
-                                                color: _statusColors[status],
+                                                        Radius.circular(5)),
+                                                color: statusColors[status],
                                               ),
                                               child: Center(
                                                 child: Text(
@@ -247,19 +243,69 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String cleanDescription(String description) {
+  void _showTaskDetailBottomSheet(
+      BuildContext context, task, Color statusColor) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return TaskDetailBottomSheet(
+          title: task?.title ?? 'No Title',
+          projectName: task?.project?.name ?? 'No Project',
+          assignedBy: task?.assignedByUser?.name ?? 'Unknown',
+          dueDate: _formatDate(task?.dueDate),
+          status: task?.status ?? 'Not Started',
+          statusColor: statusColor,
+          priority: _getPriorityLabel(task?.priority ?? 0),
+          reviewer: task?.reviewer?.name ?? 'Unknown',
+          description: _cleanDescription(task?.description ?? ''),
+          onStatusChange: (String newStatus) {
+            final int taskId = task?.id ?? 0;
+            const String statusNote = 'Some Note';
+            _homeController.changeStatus(
+                context, taskId, newStatus, statusNote);
+            setState(() {
+              task?.status = newStatus;
+            });
+            Navigator.pop(context);
+          },
+        );
+      },
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime? dueDate) {
+    return dueDate != null
+        ? DateFormat('dd/MM/yyyy').format(dueDate)
+        : 'No Due Date';
+  }
+
+  String _cleanDescription(String description) {
     String cleaned = description.replaceAll(RegExp(r'<[^>]*>'), '');
-
     cleaned = cleaned.replaceAll('&nbsp;', ' ');
-
     cleaned = cleaned.replaceAll('\n', ' ');
-
     cleaned = cleaned.trim();
-
     return cleaned;
   }
 
-  Future<void> logout(BuildContext context) async {
+  String _getPriorityLabel(int priority) {
+    switch (priority) {
+      case 1:
+        return 'Critical';
+      case 2:
+        return 'High';
+      case 3:
+        return 'Medium';
+      case 4:
+        return 'Low';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  Future<void> _logout(BuildContext context) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.remove(AppConfig.token);
     await sharedPreferences.setBool(AppConfig.loggedIn, false);
@@ -270,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void logoutConfirmation() {
+  void _showLogoutConfirmation() {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -287,12 +333,11 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () async {
+              onPressed: () {
                 Navigator.of(context).pop();
-                await logout(context);
-                log("logged out");
+                _logout(context);
               },
-              child: const Text('Confirm'),
+              child: const Text('Logout'),
             ),
           ],
         );
@@ -300,18 +345,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String getPriorityLabel(int priority) {
-    switch (priority) {
-      case 1:
-        return 'Critical';
-      case 2:
-        return 'High';
-      case 3:
-        return 'Medium';
-      case 4:
-        return 'Low';
-      default:
-        return 'Unknown';
-    }
+  void _onStatusSelected(BuildContext context, task, String newStatus) {
+    final int taskId = task.id ?? 0;
+    const String statusNote = 'Some Note';
+    _homeController.changeStatus(context, taskId, newStatus, statusNote);
+    setState(() {
+      task.status = newStatus;
+    });
   }
 }

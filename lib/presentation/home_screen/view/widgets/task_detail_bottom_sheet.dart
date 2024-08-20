@@ -23,7 +23,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
     required this.priority,
     required this.reviewer,
     required this.description,
-    required this.onStatusChange, // Accept callback for status change
+    required this.onStatusChange,
   });
 
   final Map<String, Color> _statusColors = {

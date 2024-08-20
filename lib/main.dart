@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:omnisell_worksportal/presentation/bottom_navigation_screen/controller/bottom_navigation_controller.dart';
+import 'package:omnisell_worksportal/presentation/bottom_navigation_screen/view/bottom_navigation_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/controller/home_controller.dart';
@@ -19,6 +21,7 @@ void main() async {
     providers: [
       ChangeNotifierProvider(create: (context) => LoginController()),
       ChangeNotifierProvider(create: (context) => HomeController()),
+      ChangeNotifierProvider(create: (context) => BottomNavigationController()),
     ],
     child: MyApp(isLoggedIn: loggedIn, userId: userId),
   ));
@@ -40,7 +43,9 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: isLoggedIn ? HomeScreen(userId: userId) : const LoginScreen(),
+      home: isLoggedIn
+          ? StatusNavigationBar(userId: userId)
+          : const LoginScreen(),
     );
   }
 }

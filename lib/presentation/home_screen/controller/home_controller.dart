@@ -14,37 +14,51 @@ class HomeController extends ChangeNotifier {
 
   bool isLoading = false;
   bool isStatusLoading = false;
-  bool isStatusViewLoading = false;
 
-  fetchData(context, userId) async {
-    isLoading = true;
-    notifyListeners();
-    log("HomeController -> fetchData()");
-    HomeService.fetchData(userId).then((value) {
-      if (value != null && value["status"] == "success") {
-        taskModel = TaskModel.fromJson(value);
-        isLoading = false;
-      } else {
-        AppUtils.oneTimeSnackBar("Unable to fetch Data",
-            context: context, bgColor: ColorTheme.red);
-      }
-      notifyListeners();
-    });
+  int? userId;
+
+  void setUserId(int id) {
+    userId = id;
   }
 
-  changeStatus(context, int id, String status, String? note) async {
+  Future<void> fetchTasksByStatus(BuildContext context, String status) async {
+    isLoading = true;
+    notifyListeners();
+    log("Fetching tasks by status: $status");
+
+    try {
+      final value = await HomeService.fetchData(userId!, status: status);
+      if (value != null && value["status"] == "success") {
+        taskModel = TaskModel.fromJson(value);
+      } else {
+        AppUtils.oneTimeSnackBar("Unable to fetch Data", context: context, bgColor: ColorTheme.red);
+      }
+    } catch (e) {
+      AppUtils.oneTimeSnackBar("An error occurred", context: context, bgColor: ColorTheme.red);
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+
+  Future<void> changeStatus(BuildContext context, int id, String status, String? note) async {
     isStatusLoading = true;
     notifyListeners();
-    log("HomeController -> changeStatus()");
-    HomeService.changeStatus(id, status, note).then((value) {
+    log("Changing status for task ID: $id to $status");
+
+    try {
+      final value = await HomeService.changeStatus(id, status, note);
       if (value != null && value["status"] == "success") {
-        statusModel = StatusModel.fromJson(value);
-        isStatusLoading = false;
+        await fetchTasksByStatus(context, status);
       } else {
-        AppUtils.oneTimeSnackBar("Unable to fetch Data",
-            context: context, bgColor: ColorTheme.red);
+        AppUtils.oneTimeSnackBar("Unable to update status", context: context, bgColor: ColorTheme.red);
       }
+    } catch (e) {
+      AppUtils.oneTimeSnackBar("An error occurred", context: context, bgColor: ColorTheme.red);
+    } finally {
+      isStatusLoading = false;
       notifyListeners();
-    });
+    }
   }
 }
