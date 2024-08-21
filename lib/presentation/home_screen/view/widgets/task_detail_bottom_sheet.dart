@@ -62,7 +62,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
                         color: Colors.grey,
                       ),
                     ),
-                    Expanded(
+                    Flexible(
                       child: Text(
                         projectName,
                         style: const TextStyle(
@@ -86,81 +86,80 @@ class TaskDetailBottomSheet extends StatelessWidget {
                 const Divider(thickness: 0.25, height: 32),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Assigned by",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey,
-                            ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Assigned by",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey,
                           ),
-                          Text(
-                            assignedBy,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
-                            ),
+                        ),
+                        Text(
+                          assignedBy,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
                           ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            "Reviewer",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey,
-                            ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          "Reviewer",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey,
                           ),
-                          Text(
-                            reviewer,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
-                            ),
+                        ),
+                        Text(
+                          reviewer,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
                           ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            "Due date",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey,
-                            ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          "Due date",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey,
                           ),
-                          Text(
-                            dueDate,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
-                            ),
+                        ),
+                        Text(
+                          dueDate,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
                           ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            "Priority",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey,
-                            ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          "Priority",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey,
                           ),
-                          Text(
-                            priority,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
-                            ),
+                        ),
+                        Text(
+                          priority,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
                           ),
-                          const SizedBox(height: 10),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
                     ),
                     PopupMenuButton<String>(
                       onSelected: (String newStatus) {

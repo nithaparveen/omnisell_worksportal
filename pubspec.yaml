@@ -40,7 +40,7 @@ dependencies:
   http: ^1.2.1
   shared_preferences: ^2.2.3
   provider: ^6.1.2
-  persistent_bottom_nav_bar: ^6.2.1
+  persistent_bottom_nav_bar:
   rename_app: ^1.6.1
 
 dev_dependencies:

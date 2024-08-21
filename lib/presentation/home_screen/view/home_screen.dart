@@ -77,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
             [];
 
         if (controller.isLoading) {
+          log("loading data");
           return const Center(
             child: CircularProgressIndicator(
               backgroundColor: Colors.white,

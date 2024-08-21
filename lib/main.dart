@@ -4,7 +4,6 @@ import 'package:omnisell_worksportal/presentation/bottom_navigation_screen/view/
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/controller/home_controller.dart';
-import 'package:omnisell_worksportal/presentation/home_screen/view/home_screen.dart';
 import 'package:omnisell_worksportal/presentation/login_screen/controller/login_controller.dart';
 import 'package:omnisell_worksportal/presentation/login_screen/view/login_screen.dart';
 import 'app_config/app_config.dart';

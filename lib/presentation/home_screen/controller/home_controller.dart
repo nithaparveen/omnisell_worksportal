@@ -29,6 +29,7 @@ class HomeController extends ChangeNotifier {
     try {
       final value = await HomeService.fetchData(userId!, status: status);
       if (value != null && value["status"] == "success") {
+        log("data fetched");
         taskModel = TaskModel.fromJson(value);
       } else {
         AppUtils.oneTimeSnackBar("Unable to fetch Data", context: context, bgColor: ColorTheme.red);

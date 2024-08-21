@@ -29,7 +29,7 @@ class HomeService {
     try {
       var decodedData = await ApiHelper.getData(
         endPoint:
-        "projects/tasks/change-status?task_id=$id&status=$status&status_note=${Uri.encodeComponent(note ?? '')}",
+            "projects/tasks/change-status?task_id=$id&status=$status&status_note=${Uri.encodeComponent(note ?? '')}",
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData;
