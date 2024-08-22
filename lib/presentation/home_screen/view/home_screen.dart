@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/view/widgets/task_detail_bottom_sheet.dart';
@@ -21,25 +20,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late HomeController _homeController;
+  late HomeController homeController;
 
   @override
   void initState() {
     super.initState();
-    _homeController = Provider.of<HomeController>(context, listen: false);
-    _homeController.setUserId(widget.userId);
-    _fetchData();
+    homeController = Provider.of<HomeController>(context, listen: false);
+    homeController.setUserId(widget.userId);
+    fetchData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _fetchData();
+    fetchData();
   }
 
-  void _fetchData() async {
+  void fetchData() async {
     String statusFilter = widget.statusFilter ?? '';
-    await _homeController.fetchTasksByStatus(context, statusFilter);
+    await homeController.fetchTasksByStatus(context, statusFilter);
   }
 
   final Map<String, Color> statusColors = {
@@ -65,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
               size: 20,
               color: Colors.black,
             ),
-            onPressed: _showLogoutConfirmation,
+            onPressed: showLogoutConfirmation,
           ),
         ],
       ),
@@ -77,7 +76,6 @@ class _HomeScreenState extends State<HomeScreen> {
             [];
 
         if (controller.isLoading) {
-          log("loading data");
           return const Center(
             child: CircularProgressIndicator(
               backgroundColor: Colors.white,
@@ -108,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   return InkWell(
                     onTap: () =>
-                        _showTaskDetailBottomSheet(context, task, currentColor),
+                        showTaskDetailBottomSheet(context, task, currentColor),
                     child: Card(
                       surfaceTintColor: Colors.white,
                       elevation: 1,
@@ -182,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: Center(
                                     child: PopupMenuButton<String>(
                                       onSelected: (String value) =>
-                                          _onStatusSelected(
+                                          onStatusSelected(
                                               context, task, value),
                                       itemBuilder: (BuildContext context) {
                                         return statusColors.keys
@@ -244,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showTaskDetailBottomSheet(
+  void showTaskDetailBottomSheet(
       BuildContext context, task, Color statusColor) {
     showModalBottomSheet(
       context: context,
@@ -253,16 +251,16 @@ class _HomeScreenState extends State<HomeScreen> {
           title: task?.title ?? 'No Title',
           projectName: task?.project?.name ?? 'No Project',
           assignedBy: task?.assignedByUser?.name ?? 'Unknown',
-          dueDate: _formatDate(task?.dueDate),
+          dueDate: formatDate(task?.dueDate),
           status: task?.status ?? 'Not Started',
           statusColor: statusColor,
-          priority: _getPriorityLabel(task?.priority ?? 0),
+          priority: getPriorityLabel(task?.priority ?? 0),
           reviewer: task?.reviewer?.name ?? 'Unknown',
-          description: _cleanDescription(task?.description ?? ''),
+          description: cleanDescription(task?.description ?? ''),
           onStatusChange: (String newStatus) {
             final int taskId = task?.id ?? 0;
             const String statusNote = 'Some Note';
-            _homeController.changeStatus(
+            homeController.changeStatus(
                 context, taskId, newStatus, statusNote);
             setState(() {
               task?.status = newStatus;
@@ -277,13 +275,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String _formatDate(DateTime? dueDate) {
+  String formatDate(DateTime? dueDate) {
     return dueDate != null
         ? DateFormat('dd/MM/yyyy').format(dueDate)
         : 'No Due Date';
   }
 
-  String _cleanDescription(String description) {
+  String cleanDescription(String description) {
     String cleaned = description.replaceAll(RegExp(r'<[^>]*>'), '');
     cleaned = cleaned.replaceAll('&nbsp;', ' ');
     cleaned = cleaned.replaceAll('\n', ' ');
@@ -291,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return cleaned;
   }
 
-  String _getPriorityLabel(int priority) {
+  String getPriorityLabel(int priority) {
     switch (priority) {
       case 1:
         return 'Critical';
@@ -306,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _logout(BuildContext context) async {
+  Future<void> logout(BuildContext context) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.remove(AppConfig.token);
     await sharedPreferences.setBool(AppConfig.loggedIn, false);
@@ -317,7 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showLogoutConfirmation() {
+  void showLogoutConfirmation() {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -336,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _logout(context);
+                logout(context);
               },
               child: const Text('Logout'),
             ),
@@ -346,10 +344,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _onStatusSelected(BuildContext context, task, String newStatus) {
+  void onStatusSelected(BuildContext context, task, String newStatus) {
     final int taskId = task.id ?? 0;
     const String statusNote = 'Some Note';
-    _homeController.changeStatus(context, taskId, newStatus, statusNote);
+    homeController.changeStatus(context, taskId, newStatus, statusNote);
     setState(() {
       task.status = newStatus;
     });

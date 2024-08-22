@@ -5,12 +5,12 @@ class TaskDetailBottomSheet extends StatelessWidget {
   final String projectName;
   final String assignedBy;
   final String dueDate;
-  String status; // Make status mutable
+  String status;
   final Color statusColor;
   final String priority;
   final String reviewer;
   final String description;
-  final Function(String) onStatusChange; // Callback for status change
+  final Function(String) onStatusChange;
 
   TaskDetailBottomSheet({
     super.key,
@@ -163,7 +163,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
                     ),
                     PopupMenuButton<String>(
                       onSelected: (String newStatus) {
-                        onStatusChange(newStatus); // Invoke callback
+                        onStatusChange(newStatus);
                       },
                       itemBuilder: (BuildContext context) {
                         return _statusColors.keys.map((String status) {

@@ -32,10 +32,12 @@ class HomeController extends ChangeNotifier {
         log("data fetched");
         taskModel = TaskModel.fromJson(value);
       } else {
-        AppUtils.oneTimeSnackBar("Unable to fetch Data", context: context, bgColor: ColorTheme.red);
+        AppUtils.oneTimeSnackBar(
+            "Unable to fetch Data", context: context, bgColor: ColorTheme.red);
       }
     } catch (e) {
-      AppUtils.oneTimeSnackBar("An error occurred", context: context, bgColor: ColorTheme.red);
+      AppUtils.oneTimeSnackBar(
+          "An error occurred", context: context, bgColor: ColorTheme.red);
     } finally {
       isLoading = false;
       notifyListeners();
@@ -43,7 +45,8 @@ class HomeController extends ChangeNotifier {
   }
 
 
-  Future<void> changeStatus(BuildContext context, int id, String status, String? note) async {
+  Future<void> changeStatus(BuildContext context, int id, String status,
+      String? note) async {
     isStatusLoading = true;
     notifyListeners();
     log("Changing status for task ID: $id to $status");
@@ -53,10 +56,12 @@ class HomeController extends ChangeNotifier {
       if (value != null && value["status"] == "success") {
         await fetchTasksByStatus(context, status);
       } else {
-        AppUtils.oneTimeSnackBar("Unable to update status", context: context, bgColor: ColorTheme.red);
+        AppUtils.oneTimeSnackBar("Unable to update status", context: context,
+            bgColor: ColorTheme.red);
       }
     } catch (e) {
-      AppUtils.oneTimeSnackBar("An error occurred", context: context, bgColor: ColorTheme.red);
+      AppUtils.oneTimeSnackBar(
+          "An error occurred", context: context, bgColor: ColorTheme.red);
     } finally {
       isStatusLoading = false;
       notifyListeners();

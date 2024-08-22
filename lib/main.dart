@@ -12,8 +12,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool loggedIn = prefs.getBool(AppConfig.loggedIn) ?? false;
-
-  // Retrieve the userId from SharedPreferences
   int userId = prefs.getInt(AppConfig.userId) ?? 0;
 
   runApp(MultiProvider(

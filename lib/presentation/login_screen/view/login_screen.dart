@@ -20,17 +20,17 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Omnisell - Dashboard",
-          style: GLTextStyles.cabinStyle(size: 22),
+        appBar: AppBar(
+          title: Text(
+            "Omnisell - Dashboard",
+            style: GLTextStyles.cabinStyle(size: 22),
+          ),
+          centerTitle: true,
+          forceMaterialTransparency: true,
         ),
-        centerTitle: true,
-        forceMaterialTransparency: true,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-            padding: const EdgeInsets.only(left: 25,right: 25,top: 25),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 25, right: 25, top: 25),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -41,46 +41,47 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: size.width * .03),
                 Text(
                   "Email Address",
-                  style:
-                      GLTextStyles.interStyle(size: 14, weight: FontWeight.w500),
+                  style: GLTextStyles.interStyle(
+                      size: 14, weight: FontWeight.w500),
                 ),
                 SizedBox(height: size.width * .02),
                 TextFormField(
                   controller: emailController,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1, color: Color(0xff1A3447)),
+                      borderSide:
+                          BorderSide(width: 1, color: Color(0xff1A3447)),
                     ),
                   ),
                 ),
                 SizedBox(height: size.width * .03),
                 Text(
                   "Password",
-                  style:
-                      GLTextStyles.interStyle(size: 14, weight: FontWeight.w500),
+                  style: GLTextStyles.interStyle(
+                      size: 14, weight: FontWeight.w500),
                 ),
                 SizedBox(height: size.width * .02),
                 Consumer<LoginController>(builder: (context, controller, _) {
-                    return TextFormField(
-                      obscureText: controller.visibility,
-                      obscuringCharacter: '*',
-                      controller: passwordController,
-                      decoration: InputDecoration(
-                        prefixIcon: IconButton(
-                          onPressed: () {
-                            controller.onPressed();
-                          },
-                          icon: Icon(controller.visibility == true
-                              ? Icons.visibility_off
-                              : Icons.visibility),
-                        ),
-                        border: const OutlineInputBorder(
-                          borderSide: BorderSide(width: 1, color: Color(0xff1A3447)),
-                        ),
+                  return TextFormField(
+                    obscureText: controller.visibility,
+                    obscuringCharacter: '*',
+                    controller: passwordController,
+                    decoration: InputDecoration(
+                      prefixIcon: IconButton(
+                        onPressed: () {
+                          controller.onPressed();
+                        },
+                        icon: Icon(controller.visibility == true
+                            ? Icons.visibility_off
+                            : Icons.visibility),
                       ),
-                    );
-                  }
-                ),
+                      border: const OutlineInputBorder(
+                        borderSide:
+                            BorderSide(width: 1, color: Color(0xff1A3447)),
+                      ),
+                    ),
+                  );
+                }),
                 SizedBox(
                   height: size.width * .04,
                 ),
@@ -88,12 +89,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: size.height * 0.085,
                   width: size.width * 0.95,
                   child: MaterialButton(
-                    shape:RoundedRectangleBorder(borderRadius: BorderRadiusDirectional.circular(10)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadiusDirectional.circular(10)),
                     color: ColorTheme.lightBlue,
                     onPressed: () {
                       Provider.of<LoginController>(context, listen: false)
                           .onLogin(emailController.text.trim(),
-                          passwordController.text.trim(), context);
+                              passwordController.text.trim(), context);
                     },
                     child: Text(
                       "Login",
@@ -107,7 +109,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
           ),
-      )
-    );
+        ));
   }
 }
