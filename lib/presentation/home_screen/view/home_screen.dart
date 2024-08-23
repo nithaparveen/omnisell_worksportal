@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:omnisell_worksportal/core/constants/colors.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/view/widgets/task_detail_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -55,8 +58,35 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xffF6F6F6),
-      appBar: GLAppBar(
-        title: "Work Board",
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            SizedBox(
+                height: 30,
+                width: 20,
+                child: Image.asset("assets/logo-sw.png")),
+            const SizedBox(
+              width: 15,
+            ),
+            Text("Work Board", style: GLTextStyles.cabinStyle(size: 22)),
+          ],
+        ),
+//         Row(
+//   children: [
+//     SizedBox(
+//       height: MediaQuery.of(context).size.height * 0.05, // Adjust height as a percentage of screen height
+//       width: MediaQuery.of(context).size.width * 0.1,  // Adjust width as a percentage of screen width
+//       child: Image.asset("assets/logo-sw.png"),
+//     ),
+//     const SizedBox(width: 15,),
+//     Text(
+//       "Work Board",
+//       style: GLTextStyles.cabinStyle(size: MediaQuery.of(context).size.width * 0.05), // Adjust text size
+//     ),
+//   ],
+// ),
+
         actions: [
           IconButton(
             icon: const Icon(
@@ -67,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: showLogoutConfirmation,
           ),
         ],
+        forceMaterialTransparency: true,
       ),
       body: Consumer<HomeController>(builder: (context, controller, _) {
         var filteredTasks = controller.taskModel.data?.data?.where((task) {
@@ -85,7 +116,12 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         if (filteredTasks.isEmpty) {
-          return const Center(child: Text("No tasks available"));
+          return Center(
+              child: Text(
+            "No tasks available",
+            style: GLTextStyles.cabinStyle(
+                size: 16, weight: FontWeight.w400, color: Colors.grey),
+          ));
         }
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -108,7 +144,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: () =>
                         showTaskDetailBottomSheet(context, task, currentColor),
                     child: Card(
-                      surfaceTintColor: const Color(0xFFFFFFFF),
+                      // surfaceTintColor: Colors.white,
+                      color: ColorTheme.white,
                       elevation: 1,
                       child: Padding(
                         padding: const EdgeInsets.all(20),
@@ -267,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   context, widget.statusFilter ?? '');
               setState(() {});
             } catch (e) {
-              print('Error changing status: $e');
+              log("Error changing status: $e");
             }
             Navigator.pop(context);
             setState(() {});
@@ -359,7 +396,7 @@ class _HomeScreenState extends State<HomeScreen> {
           context, widget.statusFilter ?? '');
       setState(() {});
     } catch (e) {
-      print('Error changing status: $e');
+      log('Error changing status: $e');
     }
   }
 }

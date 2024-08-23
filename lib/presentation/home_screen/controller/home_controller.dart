@@ -32,12 +32,12 @@ class HomeController extends ChangeNotifier {
         log("data fetched");
         taskModel = TaskModel.fromJson(value);
       } else {
-        AppUtils.oneTimeSnackBar(
-            "Unable to fetch Data", context: context, bgColor: ColorTheme.red);
+        AppUtils.oneTimeSnackBar("Unable to fetch Data",
+            context: context, bgColor: ColorTheme.red);
       }
     } catch (e) {
-      AppUtils.oneTimeSnackBar(
-          "An error occurred", context: context, bgColor: ColorTheme.red);
+      AppUtils.oneTimeSnackBar("An error occurred",
+          context: context, bgColor: ColorTheme.red);
     } finally {
       isLoading = false;
       notifyListeners();
@@ -57,12 +57,12 @@ class HomeController extends ChangeNotifier {
         AppUtils.oneTimeSnackBar("Status updated successfully",
             context: context, bgColor: ColorTheme.green);
       } else {
-        AppUtils.oneTimeSnackBar(
-            "Unable to update status", context: context, bgColor: ColorTheme.red);
+        AppUtils.oneTimeSnackBar("Unable to update status",
+            context: context, bgColor: ColorTheme.red);
       }
     } catch (e) {
-      AppUtils.oneTimeSnackBar(
-          "An error occurred", context: context, bgColor: ColorTheme.red);
+      AppUtils.oneTimeSnackBar("An error occurred",
+          context: context, bgColor: ColorTheme.red);
     } finally {
       isStatusLoading = false;
       notifyListeners();
