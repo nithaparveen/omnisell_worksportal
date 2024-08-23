@@ -44,26 +44,35 @@ class HomeController extends ChangeNotifier {
     }
   }
 
-
-  Future<void> changeStatus(BuildContext context, int id, String status,
-      String? note) async {
+  Future<void> changeStatus(
+      BuildContext context, int id, String status, String? note) async {
     isStatusLoading = true;
     notifyListeners();
-    log("Changing status for task ID: $id to $status");
+    print("Changing status for task ID: $id to $status");
 
     try {
       final value = await HomeService.changeStatus(id, status, note);
       if (value != null && value["status"] == "success") {
-        await fetchTasksByStatus(context, status);
+        updateTaskStatus(id, status);
+        AppUtils.oneTimeSnackBar("Status updated successfully",
+            context: context, bgColor: ColorTheme.green);
       } else {
-        AppUtils.oneTimeSnackBar("Unable to update status", context: context,
-            bgColor: ColorTheme.red);
+        AppUtils.oneTimeSnackBar(
+            "Unable to update status", context: context, bgColor: ColorTheme.red);
       }
     } catch (e) {
       AppUtils.oneTimeSnackBar(
           "An error occurred", context: context, bgColor: ColorTheme.red);
     } finally {
       isStatusLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void updateTaskStatus(int id, String newStatus) {
+    final taskIndex = taskModel.data?.data?.indexWhere((task) => task.id == id);
+    if (taskIndex != null && taskIndex != -1) {
+      taskModel.data?.data?[taskIndex].status = newStatus;
       notifyListeners();
     }
   }

@@ -30,11 +30,11 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchData();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    fetchData();
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   fetchData();
+  // }
 
   void fetchData() async {
     String statusFilter = widget.statusFilter ?? '';
@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: () =>
                         showTaskDetailBottomSheet(context, task, currentColor),
                     child: Card(
-                      surfaceTintColor: Colors.white,
+                      surfaceTintColor: const Color(0xFFFFFFFF),
                       elevation: 1,
                       child: Padding(
                         padding: const EdgeInsets.all(20),
@@ -257,15 +257,20 @@ class _HomeScreenState extends State<HomeScreen> {
           priority: getPriorityLabel(task?.priority ?? 0),
           reviewer: task?.reviewer?.name ?? 'Unknown',
           description: cleanDescription(task?.description ?? ''),
-          onStatusChange: (String newStatus) {
+          onStatusChange: (String newStatus) async {
             final int taskId = task?.id ?? 0;
             const String statusNote = 'Some Note';
-            homeController.changeStatus(
-                context, taskId, newStatus, statusNote);
-            setState(() {
-              task?.status = newStatus;
-            });
+            try {
+              await homeController.changeStatus(
+                  context, taskId, newStatus, statusNote);
+              await homeController.fetchTasksByStatus(
+                  context, widget.statusFilter ?? '');
+              setState(() {});
+            } catch (e) {
+              print('Error changing status: $e');
+            }
             Navigator.pop(context);
+            setState(() {});
           },
         );
       },
@@ -326,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: GLTextStyles.cabinStyle(size: 18),
           ),
           content: const Text('Are you sure you want to log out?'),
-          actions: <Widget>[
+          actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
@@ -344,12 +349,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void onStatusSelected(BuildContext context, task, String newStatus) {
+  void onStatusSelected(BuildContext context, task, String newStatus) async {
     final int taskId = task.id ?? 0;
     const String statusNote = 'Some Note';
-    homeController.changeStatus(context, taskId, newStatus, statusNote);
-    setState(() {
-      task.status = newStatus;
-    });
+
+    try {
+      await homeController.changeStatus(context, taskId, newStatus, statusNote);
+      await homeController.fetchTasksByStatus(
+          context, widget.statusFilter ?? '');
+      setState(() {});
+    } catch (e) {
+      print('Error changing status: $e');
+    }
   }
 }
