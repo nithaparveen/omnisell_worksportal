@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../app_config/app_config.dart';
 import '../../../core/constants/textstyles.dart';
-import '../../../global_widget/global_appbar.dart';
 import '../../login_screen/view/login_screen.dart';
 import '../controller/home_controller.dart';
 
@@ -75,18 +74,17 @@ class _HomeScreenState extends State<HomeScreen> {
 //         Row(
 //   children: [
 //     SizedBox(
-//       height: MediaQuery.of(context).size.height * 0.05, // Adjust height as a percentage of screen height
-//       width: MediaQuery.of(context).size.width * 0.1,  // Adjust width as a percentage of screen width
+//       height: MediaQuery.of(context).size.height * 0.05,
+//       width: MediaQuery.of(context).size.width * 0.1,
 //       child: Image.asset("assets/logo-sw.png"),
 //     ),
 //     const SizedBox(width: 15,),
 //     Text(
 //       "Work Board",
-//       style: GLTextStyles.cabinStyle(size: MediaQuery.of(context).size.width * 0.05), // Adjust text size
+//       style: GLTextStyles.cabinStyle(size: MediaQuery.of(context).size.width * 0.05),
 //     ),
 //   ],
 // ),
-
         actions: [
           IconButton(
             icon: const Icon(
@@ -109,8 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
         if (controller.isLoading) {
           return const Center(
             child: CircularProgressIndicator(
-              backgroundColor: Colors.white,
-              color: Colors.grey,
+              backgroundColor: Colors.transparent,
+              color: Color.fromARGB(255, 46, 146, 157)
             ),
           );
         }
@@ -303,10 +301,10 @@ class _HomeScreenState extends State<HomeScreen> {
               await homeController.fetchTasksByStatus(
                   context, widget.statusFilter ?? '');
               setState(() {});
+              Navigator.pop(context);
             } catch (e) {
               log("Error changing status: $e");
             }
-            Navigator.pop(context);
             setState(() {});
           },
         );

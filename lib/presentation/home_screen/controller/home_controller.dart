@@ -1,11 +1,13 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/repository/api/home_screen/model/status_model.dart';
 import 'package:omnisell_worksportal/repository/api/home_screen/model/task_detail_model.dart';
 import 'package:omnisell_worksportal/repository/api/home_screen/model/task_model.dart';
 import 'package:omnisell_worksportal/repository/api/home_screen/service/home_service.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/utils/app_utils.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class HomeController extends ChangeNotifier {
   TaskModel taskModel = TaskModel();
@@ -46,6 +48,7 @@ class HomeController extends ChangeNotifier {
 
   Future<void> changeStatus(
       BuildContext context, int id, String status, String? note) async {
+    var size = MediaQuery.sizeOf(context);
     isStatusLoading = true;
     notifyListeners();
     print("Changing status for task ID: $id to $status");
@@ -54,8 +57,21 @@ class HomeController extends ChangeNotifier {
       final value = await HomeService.changeStatus(id, status, note);
       if (value != null && value["status"] == "success") {
         updateTaskStatus(id, status);
-        AppUtils.oneTimeSnackBar("Status updated successfully",
-            context: context, bgColor: ColorTheme.green);
+        Flushbar(
+          maxWidth: size.width * .65,
+          backgroundColor: Color.fromARGB(255, 97, 182, 86),
+          icon: Icon(
+            Icons.done_sharp,
+            color: ColorTheme.white,
+            size: 18,
+          ),
+          messageText: Text(
+            "Status updated successfully",
+            style: GLTextStyles.openSans(size: 14, weight: FontWeight.w500,color: ColorTheme.white),
+          ),
+          duration: const Duration(seconds: 3),
+          flushbarPosition: FlushbarPosition.BOTTOM,
+        ).show(context);
       } else {
         AppUtils.oneTimeSnackBar("Unable to update status",
             context: context, bgColor: ColorTheme.red);
