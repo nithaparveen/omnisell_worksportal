@@ -95,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: showLogoutConfirmation,
           ),
         ],
+        automaticallyImplyLeading: false,
         forceMaterialTransparency: true,
       ),
       body: Consumer<HomeController>(builder: (context, controller, _) {

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1084451795566",
+    "project_id": "omnisell-crm",
+    "storage_bucket": "omnisell-crm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084451795566:android:7601792dc8962b4fe56c7f",
+        "android_client_info": {
+          "package_name": "com.omnisell_worksportal.omnisell_worksportal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnmuX1Eo9czU7ZKY4VKCtalA4YobE37lM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

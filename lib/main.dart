@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:omnisell_worksportal/presentation/bottom_navigation_screen/controller/bottom_navigation_controller.dart';
 import 'package:omnisell_worksportal/presentation/bottom_navigation_screen/view/bottom_navigation_screen.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/controller/home_controller.dart';
@@ -22,6 +23,13 @@ void main() async {
     ],
     child: MyApp(isLoggedIn: loggedIn, userId: userId),
   ));
+  initOneSignal();
+}
+
+Future<void> initOneSignal() async {
+  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+  OneSignal.initialize("19ba2058-3400-4f7a-a3ce-9ebfa69a56c0");
+  await OneSignal.Notifications.requestPermission(true);
 }
 
 class MyApp extends StatelessWidget {
@@ -29,9 +37,11 @@ class MyApp extends StatelessWidget {
   final int userId;
 
   const MyApp({super.key, required this.isLoggedIn, required this.userId});
+  static final navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
+    onClickOneSignal();
     return MaterialApp(
       theme: ThemeData(
         popupMenuTheme: const PopupMenuThemeData(
@@ -39,10 +49,20 @@ class MyApp extends StatelessWidget {
           color: Colors.white70,
         ),
       ),
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       home: isLoggedIn
           ? StatusNavigationBar(userId: userId)
           : const LoginScreen(),
     );
+  }
+
+  void onClickOneSignal() {
+    OneSignal.Notifications.addClickListener((event) {
+      navigatorKey.currentState?.push(
+        MaterialPageRoute(
+            builder: (context) => StatusNavigationBar(userId: userId)),
+      );
+    });
   }
 }
