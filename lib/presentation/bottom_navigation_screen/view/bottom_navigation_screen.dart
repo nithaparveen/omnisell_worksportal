@@ -1,8 +1,7 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:omnisell_worksportal/presentation/attendance_screen/view/attendance_screen.dart';
+import 'package:omnisell_worksportal/presentation/home_screen/view/home_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import 'package:provider/provider.dart';
-import '../controller/bottom_navigation_controller.dart';
 
 class StatusNavigationBar extends StatefulWidget {
   const StatusNavigationBar({super.key, required this.userId});
@@ -20,42 +19,51 @@ class _StatusNavigationBarState extends State<StatusNavigationBar> {
   void initState() {
     super.initState();
     tabController = PersistentTabController(initialIndex: 0);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<BottomNavigationController>(context, listen: false)
-          .fetchDataForTab(context, tabController.index, widget.userId);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<BottomNavigationController>(
-        builder: (context, provider, child) {
-          return PersistentTabView(
-            context,
-            controller: tabController,
-            screens: provider.buildScreens(widget.userId),
-            items: provider.navBarsItems(),
-            confineToSafeArea: true,
-            backgroundColor: Colors.white,
-            handleAndroidBackButtonPress: true,
-            resizeToAvoidBottomInset: true,
-            stateManagement: true,
-            decoration: NavBarDecoration(
-              borderRadius: BorderRadius.circular(10.0),
-              colorBehindNavBar: Colors.white,
-            ),
-            navBarStyle: NavBarStyle.style1,
-            onItemSelected: (index) {
-              provider.updateSelectedIndex(context, index, widget.userId);
-
-              setState(() {
-                tabController.index = index;
-              });
-            },
-          );
-        },
+      body: PersistentTabView(
+        context,
+        controller: tabController,
+        screens: _buildScreens(widget.userId),
+        items: _navBarsItems(),
+        confineToSafeArea: true,
+        backgroundColor: Colors.white,
+        handleAndroidBackButtonPress: true,
+        resizeToAvoidBottomInset: true,
+        stateManagement: true,
+        decoration: NavBarDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          colorBehindNavBar: Colors.white,
+        ),
+        navBarStyle: NavBarStyle.style1,
       ),
     );
+  }
+
+  List<Widget> _buildScreens(int userId) {
+    return [
+      HomeScreen(userId: userId),
+      AttendanceScreen(),  // Assuming AttendanceScreen is a separate screen for handling attendances
+    ];
+  }
+
+  List<PersistentBottomNavBarItem> _navBarsItems() {
+    return [
+      PersistentBottomNavBarItem(
+        icon: Icon(Icons.work_outlined),
+        title: "Work Board",
+        activeColorPrimary: Colors.blue,
+        inactiveColorPrimary: Colors.grey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: Icon(Icons.sticky_note_2_outlined),
+        title: "Attendances",
+        activeColorPrimary: Colors.orange,
+        inactiveColorPrimary: Colors.grey,
+      ),
+    ];
   }
 }

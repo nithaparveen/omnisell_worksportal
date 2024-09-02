@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_worksportal/core/constants/colors.dart';
@@ -21,26 +20,42 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  late HomeController homeController;
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  late TabController tabController;
 
   @override
   void initState() {
     super.initState();
-    homeController = Provider.of<HomeController>(context, listen: false);
-    homeController.setUserId(widget.userId);
-    fetchData();
+    tabController = TabController(length: 5, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final homeController = Provider.of<HomeController>(context, listen: false);
+      homeController.setUserId(widget.userId);
+      fetchData();
+    });
   }
 
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   fetchData();
-  // }
-
   void fetchData() async {
-    String statusFilter = widget.statusFilter ?? '';
+    final homeController = Provider.of<HomeController>(context, listen: false);
+    String statusFilter = getStatusFilter();
     await homeController.fetchTasksByStatus(context, statusFilter);
+  }
+
+  String getStatusFilter() {
+    int index = tabController.index;
+    switch (index) {
+      case 0:
+        return 'Not Started';
+      case 1:
+        return 'In Progress';
+      case 2:
+        return 'Review Pending';
+      case 3:
+        return 'Review Failed';
+      case 4:
+        return 'Completed';
+      default:
+        return 'Not Started';
+    }
   }
 
   final Map<String, Color> statusColors = {
@@ -61,225 +76,151 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         title: Row(
           children: [
-            SizedBox(
-                height: 30,
-                width: 20,
-                child: Image.asset("assets/logo-sw.png")),
-            const SizedBox(
-              width: 15,
-            ),
+            SizedBox(height: 30, width: 20, child: Image.asset("assets/logo-sw.png")),
+            const SizedBox(width: 15),
             Text("Work Board", style: GLTextStyles.cabinStyle(size: 22)),
           ],
         ),
-//         Row(
-//   children: [
-//     SizedBox(
-//       height: MediaQuery.of(context).size.height * 0.05,
-//       width: MediaQuery.of(context).size.width * 0.1,
-//       child: Image.asset("assets/logo-sw.png"),
-//     ),
-//     const SizedBox(width: 15,),
-//     Text(
-//       "Work Board",
-//       style: GLTextStyles.cabinStyle(size: MediaQuery.of(context).size.width * 0.05),
-//     ),
-//   ],
-// ),
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.logout_outlined,
-              size: 20,
-              color: Colors.black,
-            ),
+            icon: const Icon(Icons.logout_outlined, size: 20, color: Colors.black),
             onPressed: showLogoutConfirmation,
           ),
         ],
+        bottom: TabBar(
+          controller: tabController,
+          labelColor: Colors.black,
+          tabs: const [
+            Tab(text: "Not Started"),
+            Tab(text: "In Progress"),
+            Tab(text: "Review Pending"),
+            Tab(text: "Review Failed"),
+            Tab(text: "Completed"),
+          ],
+          onTap: (index) {
+            fetchData();
+          },
+        ),
         automaticallyImplyLeading: false,
         forceMaterialTransparency: true,
       ),
-      body: Consumer<HomeController>(builder: (context, controller, _) {
-        var filteredTasks = controller.taskModel.data?.data?.where((task) {
-              return widget.statusFilter == null ||
-                  task.status == widget.statusFilter;
-            }).toList() ??
-            [];
+      body: Consumer<HomeController>(
+        builder: (context, homeController, child) {
+          return TabBarView(
+            controller: tabController,
+            children: List.generate(5, (index) {
+              String statusFilter = getStatusFilter();
+              var filteredTasks = homeController.taskModel.data?.data?.where((task) {
+                    return task.status == statusFilter;
+                  }).toList() ??
+                  [];
 
-        if (controller.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.transparent,
-              color: Color.fromARGB(255, 46, 146, 157)
-            ),
-          );
-        }
+              if (homeController.isLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.transparent,
+                    color: Color.fromARGB(255, 46, 146, 157),
+                  ),
+                );
+              }
 
-        if (filteredTasks.isEmpty) {
-          return Center(
-              child: Text(
-            "No tasks available",
-            style: GLTextStyles.cabinStyle(
-                size: 16, weight: FontWeight.w400, color: Colors.grey),
-          ));
-        }
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: CustomScrollView(
-            slivers: [
-              SliverList.separated(
-                itemCount: filteredTasks.length,
-                itemBuilder: (context, index) {
-                  var task = filteredTasks[index];
-                  DateTime? dueDate = task.dueDate;
-                  String formattedDate = dueDate != null
-                      ? DateFormat('dd/MM/yyyy').format(dueDate)
-                      : 'No Due Date';
+              if (filteredTasks.isEmpty) {
+                return Center(
+                    child: Text(
+                  "No tasks available",
+                  style: GLTextStyles.cabinStyle(size: 16, weight: FontWeight.w400, color: Colors.grey),
+                ));
+              }
 
-                  String currentStatus = task.status ?? 'Not Started';
-                  Color currentColor =
-                      statusColors[currentStatus] ?? Colors.grey;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: CustomScrollView(
+                  slivers: [
+                    SliverList.separated(
+                      itemCount: filteredTasks.length,
+                      itemBuilder: (context, index) {
+                        var task = filteredTasks[index];
+                        DateTime? dueDate = task.dueDate;
+                        String formattedDate = dueDate != null
+                            ? DateFormat('dd/MM/yyyy').format(dueDate)
+                            : 'No Due Date';
 
-                  return InkWell(
-                    onTap: () =>
-                        showTaskDetailBottomSheet(context, task, currentColor),
-                    child: Card(
-                      // surfaceTintColor: Colors.white,
-                      color: ColorTheme.white,
-                      elevation: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              task.title ?? 'No Title',
-                              style: GLTextStyles.openSans(
-                                  size: 18, weight: FontWeight.w500),
-                            ),
-                            Text(
-                              task.project?.name ?? 'No Project',
-                              style: GLTextStyles.openSans(
-                                  size: 16,
-                                  weight: FontWeight.w400,
-                                  color: Colors.grey),
-                            ),
-                            SizedBox(height: size.width * .008),
-                            Row(
-                              children: [
-                                Text(
-                                  "assigned by: ",
-                                  style: GLTextStyles.openSans(
-                                      size: 12,
-                                      weight: FontWeight.w400,
-                                      color: Colors.grey),
-                                ),
-                                Text(
-                                  task.assignedByUser?.name ?? 'Unknown',
-                                  style: GLTextStyles.openSans(
-                                      size: 13,
-                                      weight: FontWeight.w400,
-                                      color: Colors.black),
-                                ),
-                              ],
-                            ),
-                            const Divider(thickness: .25),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Due date",
+                        String currentStatus = task.status ?? 'Not Started';
+                        Color currentColor = statusColors[currentStatus] ?? Colors.grey;
+
+                        return InkWell(
+                          onTap: () => showTaskDetailBottomSheet(context, task, currentColor),
+                          child: Card(
+                            color: ColorTheme.white,
+                            elevation: 1,
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(task.title ?? 'No Title',
+                                      style: GLTextStyles.openSans(size: 18, weight: FontWeight.w500)),
+                                  Text(task.project?.name ?? 'No Project',
                                       style: GLTextStyles.openSans(
-                                          size: 12,
-                                          weight: FontWeight.w400,
-                                          color: Colors.grey),
-                                    ),
-                                    Text(
-                                      formattedDate,
-                                      style: GLTextStyles.openSans(
-                                          size: 14,
-                                          weight: FontWeight.w400,
-                                          color: Colors.black),
-                                    ),
-                                  ],
-                                ),
-                                Container(
-                                  height: size.width * .055,
-                                  width: size.width * .26,
-                                  decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5)),
-                                    color: currentColor,
+                                          size: 16, weight: FontWeight.w400, color: Colors.grey)),
+                                  SizedBox(height: size.width * .008),
+                                  Row(
+                                    children: [
+                                      Text("assigned by: ",
+                                          style: GLTextStyles.openSans(
+                                              size: 12, weight: FontWeight.w400, color: Colors.grey)),
+                                      Text(task.assignedByUser?.name ?? 'Unknown',
+                                          style: GLTextStyles.openSans(
+                                              size: 13, weight: FontWeight.w400, color: Colors.black)),
+                                    ],
                                   ),
-                                  child: Center(
-                                    child: PopupMenuButton<String>(
-                                      onSelected: (String value) =>
-                                          onStatusSelected(
-                                              context, task, value),
-                                      itemBuilder: (BuildContext context) {
-                                        return statusColors.keys
-                                            .map((String status) {
-                                          return PopupMenuItem<String>(
-                                            value: status,
-                                            child: Container(
-                                              margin:
-                                                  const EdgeInsetsDirectional
-                                                      .all(5),
-                                              height: size.width * .075,
-                                              width: size.width * .24,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(5)),
-                                                color: statusColors[status],
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  status,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }).toList();
-                                      },
-                                      child: Text(
-                                        currentStatus,
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                        ),
+                                  const Divider(thickness: .25),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Due date",
+                                              style: GLTextStyles.openSans(
+                                                  size: 12, weight: FontWeight.w400, color: Colors.grey)),
+                                          Text(formattedDate,
+                                              style: GLTextStyles.openSans(
+                                                  size: 12, weight: FontWeight.w400, color: Colors.black)),
+                                        ],
                                       ),
-                                    ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Status",
+                                              style: GLTextStyles.openSans(
+                                                  size: 12, weight: FontWeight.w400, color: Colors.grey)),
+                                          Text(task.status ?? 'No Status',
+                                              style: GLTextStyles.openSans(
+                                                  size: 12, weight: FontWeight.w400, color: currentColor)),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) => const SizedBox(height: 5),
                     ),
-                  );
-                },
-                separatorBuilder: (context, index) =>
-                    SizedBox(height: size.width * .01),
-              )
-            ],
-          ),
-        );
-      }),
+                  ],
+                ),
+              );
+            }),
+          );
+        },
+      ),
     );
   }
 
-  void showTaskDetailBottomSheet(
-      BuildContext context, task, Color statusColor) {
+  void showTaskDetailBottomSheet(BuildContext context, task, Color statusColor) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -297,10 +238,9 @@ class _HomeScreenState extends State<HomeScreen> {
             final int taskId = task?.id ?? 0;
             const String statusNote = 'Some Note';
             try {
-              await homeController.changeStatus(
-                  context, taskId, newStatus, statusNote);
-              await homeController.fetchTasksByStatus(
-                  context, widget.statusFilter ?? '');
+              final homeController = Provider.of<HomeController>(context, listen: false);
+              await homeController.changeStatus(context, taskId, newStatus, statusNote);
+              await homeController.fetchTasksByStatus(context, widget.statusFilter ?? '');
               setState(() {});
               Navigator.pop(context);
             } catch (e) {
@@ -390,6 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const String statusNote = 'Some Note';
 
     try {
+      final homeController = Provider.of<HomeController>(context, listen: false);
       await homeController.changeStatus(context, taskId, newStatus, statusNote);
       await homeController.fetchTasksByStatus(
           context, widget.statusFilter ?? '');
