@@ -20,15 +20,22 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late TabController tabController;
 
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 5, vsync: this);
+    tabController = TabController(length: 5, vsync: this)
+      ..addListener(() {
+        if (tabController.indexIsChanging) {
+          fetchData(); // Call fetchData when the tab changes
+        }
+      });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final homeController = Provider.of<HomeController>(context, listen: false);
+      final homeController =
+          Provider.of<HomeController>(context, listen: false);
       homeController.setUserId(widget.userId);
       fetchData();
     });
@@ -76,26 +83,55 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         backgroundColor: Colors.white,
         title: Row(
           children: [
-            SizedBox(height: 30, width: 20, child: Image.asset("assets/logo-sw.png")),
+            SizedBox(
+                height: 30,
+                width: 20,
+                child: Image.asset("assets/logo-sw.png")),
             const SizedBox(width: 15),
             Text("Work Board", style: GLTextStyles.cabinStyle(size: 22)),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout_outlined, size: 20, color: Colors.black),
+            icon: const Icon(Icons.logout_outlined,
+                size: 20, color: Colors.black),
             onPressed: showLogoutConfirmation,
           ),
         ],
         bottom: TabBar(
           controller: tabController,
           labelColor: Colors.black,
-          tabs: const [
-            Tab(text: "Not Started"),
-            Tab(text: "In Progress"),
-            Tab(text: "Review Pending"),
-            Tab(text: "Review Failed"),
-            Tab(text: "Completed"),
+          tabs: [
+            Tab(
+                child: Flexible(
+                    child: Text(
+              "Not Started",
+              style: GLTextStyles.cabinStyle(size: 11),
+            ))),
+            Tab(
+                child: Flexible(
+                    child: Text(
+              "In Progress",
+              style: GLTextStyles.cabinStyle(size: 11),
+            ))),
+            Tab(
+                child: Flexible(
+                    child: Text(
+              "Review Pending",
+              style: GLTextStyles.cabinStyle(size: 11),
+            ))),
+            Tab(
+                child: Flexible(
+                    child: Text(
+              "Review Failed",
+              style: GLTextStyles.cabinStyle(size: 11),
+            ))),
+            Tab(
+                child: Flexible(
+                    child: Text(
+              "Completed",
+              style: GLTextStyles.cabinStyle(size: 9),
+            ))),
           ],
           onTap: (index) {
             fetchData();
@@ -106,14 +142,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ),
       body: Consumer<HomeController>(
         builder: (context, homeController, child) {
-          return TabBarView(
-            controller: tabController,
+          return IndexedStack(
+            index: tabController.index,
             children: List.generate(5, (index) {
               String statusFilter = getStatusFilter();
-              var filteredTasks = homeController.taskModel.data?.data?.where((task) {
-                    return task.status == statusFilter;
-                  }).toList() ??
-                  [];
+              var filteredTasks =
+                  homeController.taskModel.data?.data?.where((task) {
+                        return task.status == statusFilter;
+                      }).toList() ??
+                      [];
 
               if (homeController.isLoading) {
                 return const Center(
@@ -128,7 +165,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 return Center(
                     child: Text(
                   "No tasks available",
-                  style: GLTextStyles.cabinStyle(size: 16, weight: FontWeight.w400, color: Colors.grey),
+                  style: GLTextStyles.cabinStyle(
+                      size: 16, weight: FontWeight.w400, color: Colors.grey),
                 ));
               }
 
@@ -146,10 +184,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             : 'No Due Date';
 
                         String currentStatus = task.status ?? 'Not Started';
-                        Color currentColor = statusColors[currentStatus] ?? Colors.grey;
+                        Color currentColor =
+                            statusColors[currentStatus] ?? Colors.grey;
 
                         return InkWell(
-                          onTap: () => showTaskDetailBottomSheet(context, task, currentColor),
+                          onTap: () => showTaskDetailBottomSheet(
+                              context, task, currentColor),
                           child: Card(
                             color: ColorTheme.white,
                             elevation: 1,
@@ -159,45 +199,65 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(task.title ?? 'No Title',
-                                      style: GLTextStyles.openSans(size: 18, weight: FontWeight.w500)),
+                                      style: GLTextStyles.openSans(
+                                          size: 18, weight: FontWeight.w500)),
                                   Text(task.project?.name ?? 'No Project',
                                       style: GLTextStyles.openSans(
-                                          size: 16, weight: FontWeight.w400, color: Colors.grey)),
+                                          size: 16,
+                                          weight: FontWeight.w400,
+                                          color: Colors.grey)),
                                   SizedBox(height: size.width * .008),
                                   Row(
                                     children: [
                                       Text("assigned by: ",
                                           style: GLTextStyles.openSans(
-                                              size: 12, weight: FontWeight.w400, color: Colors.grey)),
-                                      Text(task.assignedByUser?.name ?? 'Unknown',
+                                              size: 12,
+                                              weight: FontWeight.w400,
+                                              color: Colors.grey)),
+                                      Text(
+                                          task.assignedByUser?.name ??
+                                              'Unknown',
                                           style: GLTextStyles.openSans(
-                                              size: 13, weight: FontWeight.w400, color: Colors.black)),
+                                              size: 13,
+                                              weight: FontWeight.w400,
+                                              color: Colors.black)),
                                     ],
                                   ),
                                   const Divider(thickness: .25),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text("Due date",
                                               style: GLTextStyles.openSans(
-                                                  size: 12, weight: FontWeight.w400, color: Colors.grey)),
+                                                  size: 12,
+                                                  weight: FontWeight.w400,
+                                                  color: Colors.grey)),
                                           Text(formattedDate,
                                               style: GLTextStyles.openSans(
-                                                  size: 12, weight: FontWeight.w400, color: Colors.black)),
+                                                  size: 12,
+                                                  weight: FontWeight.w400,
+                                                  color: Colors.black)),
                                         ],
                                       ),
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text("Status",
                                               style: GLTextStyles.openSans(
-                                                  size: 12, weight: FontWeight.w400, color: Colors.grey)),
+                                                  size: 12,
+                                                  weight: FontWeight.w400,
+                                                  color: Colors.grey)),
                                           Text(task.status ?? 'No Status',
                                               style: GLTextStyles.openSans(
-                                                  size: 12, weight: FontWeight.w400, color: currentColor)),
+                                                  size: 12,
+                                                  weight: FontWeight.w400,
+                                                  color: currentColor)),
                                         ],
                                       ),
                                     ],
@@ -208,7 +268,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           ),
                         );
                       },
-                      separatorBuilder: (context, index) => const SizedBox(height: 5),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 5),
                     ),
                   ],
                 ),
@@ -220,7 +281,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  void showTaskDetailBottomSheet(BuildContext context, task, Color statusColor) {
+  void showTaskDetailBottomSheet(
+      BuildContext context, task, Color statusColor) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -238,9 +300,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             final int taskId = task?.id ?? 0;
             const String statusNote = 'Some Note';
             try {
-              final homeController = Provider.of<HomeController>(context, listen: false);
-              await homeController.changeStatus(context, taskId, newStatus, statusNote);
-              await homeController.fetchTasksByStatus(context, widget.statusFilter ?? '');
+              final homeController =
+                  Provider.of<HomeController>(context, listen: false);
+              await homeController.changeStatus(
+                  context, taskId, newStatus, statusNote);
+              await homeController.fetchTasksByStatus(
+                  context, widget.statusFilter ?? '');
               setState(() {});
               Navigator.pop(context);
             } catch (e) {
@@ -330,7 +395,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     const String statusNote = 'Some Note';
 
     try {
-      final homeController = Provider.of<HomeController>(context, listen: false);
+      final homeController =
+          Provider.of<HomeController>(context, listen: false);
       await homeController.changeStatus(context, taskId, newStatus, statusNote);
       await homeController.fetchTasksByStatus(
           context, widget.statusFilter ?? '');

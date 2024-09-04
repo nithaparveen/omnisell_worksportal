@@ -8,4 +8,5 @@ class ColorTheme {
   static Color blue = const Color(0xff1A3447);
   static Color lightBlue = const Color(0xff0053a0);
   static Color yellow = const Color(0xfffaab54);
+  static Color spider = const Color.fromARGB(255, 46, 146, 157);
 }

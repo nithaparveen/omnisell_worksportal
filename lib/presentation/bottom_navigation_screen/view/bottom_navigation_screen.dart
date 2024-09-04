@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:omnisell_worksportal/core/constants/colors.dart';
+import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/presentation/attendance_screen/view/attendance_screen.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/view/home_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -53,15 +55,17 @@ class _StatusNavigationBarState extends State<StatusNavigationBar> {
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.work_outlined),
+        icon: Icon(Icons.work_outlined,size: 18,),
         title: "Work Board",
-        activeColorPrimary: Colors.blue,
+        textStyle:GLTextStyles.cabinStyle(size: 20,weight: FontWeight.w500) ,
+        activeColorPrimary:ColorTheme.spider,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.sticky_note_2_outlined),
+        icon: Icon(Icons.sticky_note_2_outlined , size:18),
         title: "Attendances",
-        activeColorPrimary: Colors.orange,
+        textStyle:GLTextStyles.cabinStyle(size: 20,weight: FontWeight.w500) ,
+        activeColorPrimary: Color.fromARGB(255, 48, 119, 101),
         inactiveColorPrimary: Colors.grey,
       ),
     ];

@@ -1,6 +1,11 @@
+import 'dart:developer';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_worksportal/core/constants/textstyles.dart';
+import 'package:omnisell_worksportal/presentation/attendance_screen/controller/attendance_controller.dart';
+import 'package:omnisell_worksportal/presentation/attendance_screen/view/widgets/attendence_table.dart';
+import 'package:provider/provider.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -25,7 +30,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   void fetchDataForDate(DateTime date) {
-    print('Fetching data for date: ${formatDate(date)}');
+    log('Fetching data for date: ${formatDate(date)}');
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    final attendanceController = Provider.of<AttendanceController>(context, listen: false);
+    attendanceController.fetchAttendance(context, formattedDate, formattedDate);
   }
 
   Future<DateTime?> showCustomDatePicker({
@@ -75,6 +83,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.sizeOf(context);
     return Scaffold(
       backgroundColor: const Color(0xffF6F6F6),
       appBar: AppBar(
@@ -90,121 +99,68 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             Text("Daily Attendance", style: GLTextStyles.cabinStyle(size: 22)),
           ],
         ),
-        automaticallyImplyLeading: false,
-        forceMaterialTransparency: true,
-      ),
-      body: Column(
-        children: [
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Selected Date: ${formatDate(selectedDate)}',
-                      style: GLTextStyles.cabinStyle(size: 18),
-                    ),
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        shape: MaterialStatePropertyAll(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        backgroundColor: const MaterialStatePropertyAll(
-                          Color(0xff468585),
-                        ),
-                      ),
-                      onPressed: () => _selectDate(context),
-                      child: Text(
-                        'Change Date',
-                        style: GLTextStyles.cabinStyle(
-                          size: 16,
-                          color: Colors.white,
-                          weight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                DataTable(
-                  columns: const <DataColumn>[
-                    DataColumn(
-                      label: Text(
-                        'Name',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    DataColumn(
-                      label: Text(
-                        'Sign In',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    DataColumn(
-                      label: Text(
-                        'Sign Out',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                  rows: const <DataRow>[
-                    DataRow(
-                      cells: <DataCell>[
-                        DataCell(
-                          Text('1'),
-                        ),
-                        DataCell(
-                          Text('https://flutter.dev/'),
-                        ),
-                        DataCell(
-                          Text('Flutter'),
-                        ),
-                      ],
-                    ),
-                    DataRow(
-                      cells: <DataCell>[
-                        DataCell(
-                          Text('2'),
-                        ),
-                        DataCell(
-                          Text('https://dart.dev/'),
-                        ),
-                        DataCell(
-                          Text('Dart'),
-                        ),
-                      ],
-                    ),
-                    DataRow(
-                      cells: <DataCell>[
-                        DataCell(
-                          Text('3'),
-                        ),
-                        DataCell(
-                          Text('https://pub.dev/'),
-                        ),
-                        DataCell(
-                          Text('Flutter Packages'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+         actions: [
+          IconButton(
+            onPressed: () {
+              fetchDataForDate(selectedDate);
+            },
+            tooltip: "Refresh",
+            icon: const Icon(
+              CupertinoIcons.refresh_circled,
+              size: 24,
+              color: Colors.black,
             ),
           ),
         ],
+        automaticallyImplyLeading: false,
+        forceMaterialTransparency: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Consumer<AttendanceController>(builder: (context, controller, _) {
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Selected Date: ${formatDate(selectedDate)}',
+                  style: GLTextStyles.cabinStyle(size: 18),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    shape: MaterialStatePropertyAll(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    backgroundColor: const MaterialStatePropertyAll(
+                      Color(0xff468585),
+                    ),
+                  ),
+                  onPressed: () => _selectDate(context),
+                  child: Text(
+                    'Change Date',
+                    style: GLTextStyles.cabinStyle(
+                      size: 16,
+                      color: Colors.white,
+                      weight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                controller.isLoading
+                    ? const Center(child:  CircularProgressIndicator(
+                      backgroundColor: Colors.transparent,
+                      color: Color.fromARGB(255, 46, 146, 157),
+                    ),)
+                    : AttendanceTableRefactored(
+                        size: size,
+                        attendanceData: controller.attendanceData,
+                      )
+              ],
+            ),
+          );
+        }),
       ),
     );
   }

@@ -5,7 +5,7 @@ import 'package:omnisell_worksportal/repository/api/attendance_screen/model/atte
 import 'package:omnisell_worksportal/repository/api/attendance_screen/service/attendance_service.dart';
 
 class AttendanceController extends ChangeNotifier {
-  AttendanceModel attendanceModel = AttendanceModel();
+  List<Datum> attendanceData = [];
   bool isLoading = false;
 
   Future<void> fetchAttendance(
@@ -14,7 +14,7 @@ class AttendanceController extends ChangeNotifier {
     notifyListeners();
     final value = await AttendanceService.fetchAttendance(fromDate, toDate);
     if (value != null && value["status"] == "success") {
-      attendanceModel = AttendanceModel.fromJson(value);
+      attendanceData = AttendanceModel.fromJson(value).data ?? [];
       isLoading = false;
     } else {
       AppUtils.oneTimeSnackBar("Unable to fetch Data",
