@@ -9,7 +9,6 @@ import '../../../core/constants/colors.dart';
 import '../../../core/utils/app_utils.dart';
 import '../../../repository/api/login_screen/service/login_service.dart';
 import '../../bottom_navigation_screen/view/bottom_navigation_screen.dart';
-import '../../home_screen/view/home_screen.dart';
 
 class LoginController extends ChangeNotifier {
   bool visibility = true;
@@ -26,7 +25,7 @@ class LoginController extends ChangeNotifier {
         final int userId = value["data"]["user"]["user_id"];
         log("userId -> $userId");
         storeUserId(userId);
-        AppUtils.oneTimeSnackBar("LoggedIn Successfully", context: context, bgColor: ColorTheme.green);
+        AppUtils.oneTimeSnackBar("LoggedIn Successfully", context: context, bgColor: const Color.fromARGB(255, 97, 182, 86),);
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(

@@ -85,10 +85,10 @@ class HomeController extends ChangeNotifier {
     }
   }
 
-  void updateTaskStatus(int id, String newStatus) {
+  void updateTaskStatus(int id, String newStatus) async {
     final taskIndex = taskModel.data?.data?.indexWhere((task) => task.id == id);
     if (taskIndex != null && taskIndex != -1) {
-      taskModel.data?.data?[taskIndex].status = newStatus;
+       taskModel.data?.data?[taskIndex].status = newStatus;
       notifyListeners();
     }
   }

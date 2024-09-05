@@ -19,4 +19,20 @@ class AttendanceService {
     }
     return {};
   }
+
+   static Future<dynamic> fetchNotSignedIn(
+      String date) async {
+    log("AttendanceService -> fetchNotSignedIn()");
+    try {
+      var decodedData = await ApiHelper.getData(
+        endPoint:
+            "employees/attendences-not-signed-in?date=$date",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+    return {};
+  }
 }

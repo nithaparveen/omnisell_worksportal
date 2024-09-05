@@ -55,14 +55,14 @@ class _StatusNavigationBarState extends State<StatusNavigationBar> {
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.work_outlined,size: 18,),
+        icon: Icon(Icons.dashboard,size: 18,),
         title: "Work Board",
         textStyle:GLTextStyles.cabinStyle(size: 20,weight: FontWeight.w500) ,
         activeColorPrimary:ColorTheme.spider,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.sticky_note_2_outlined , size:18),
+        icon: Icon(Icons.sticky_note_2, size:18),
         title: "Attendances",
         textStyle:GLTextStyles.cabinStyle(size: 20,weight: FontWeight.w500) ,
         activeColorPrimary: Color.fromARGB(255, 48, 119, 101),

@@ -25,7 +25,7 @@ void main() async {
     ],
     child: MyApp(isLoggedIn: loggedIn, userId: userId),
   ));
-  initOneSignal();
+  await initOneSignal();
 }
 
 Future<void> initOneSignal() async {

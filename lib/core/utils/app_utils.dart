@@ -47,7 +47,7 @@ class AppUtils {
         backgroundColor: bgColor ?? Colors.white60,
         content: Text(message!,
             style:
-            textStyle ?? GLTextStyles.cabinStyle(color: ColorTheme.white)),
+            textStyle ?? GLTextStyles.cabinStyle(color: ColorTheme.white , weight: FontWeight.w500,size: 14)),
         duration: Duration(seconds: time),
         margin: showOnTop
             ? EdgeInsets.only(

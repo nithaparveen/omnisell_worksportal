@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen>
     tabController = TabController(length: 5, vsync: this)
       ..addListener(() {
         if (tabController.indexIsChanging) {
-          fetchData(); // Call fetchData when the tab changes
+          fetchData();
         }
       });
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -84,8 +84,8 @@ class _HomeScreenState extends State<HomeScreen>
         title: Row(
           children: [
             SizedBox(
-                height: 30,
-                width: 20,
+                height: size.width * .075,
+                width: size.width * .055,
                 child: Image.asset("assets/logo-sw.png")),
             const SizedBox(width: 15),
             Text("Work Board", style: GLTextStyles.cabinStyle(size: 22)),
@@ -99,44 +99,45 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ],
         bottom: TabBar(
-          controller: tabController,
-          labelColor: Colors.black,
-          tabs: [
-            Tab(
-                child: Flexible(
-                    child: Text(
-              "Not Started",
-              style: GLTextStyles.cabinStyle(size: 11),
-            ))),
-            Tab(
-                child: Flexible(
-                    child: Text(
-              "In Progress",
-              style: GLTextStyles.cabinStyle(size: 11),
-            ))),
-            Tab(
-                child: Flexible(
-                    child: Text(
-              "Review Pending",
-              style: GLTextStyles.cabinStyle(size: 11),
-            ))),
-            Tab(
-                child: Flexible(
-                    child: Text(
-              "Review Failed",
-              style: GLTextStyles.cabinStyle(size: 11),
-            ))),
-            Tab(
-                child: Flexible(
-                    child: Text(
-              "Completed",
-              style: GLTextStyles.cabinStyle(size: 9),
-            ))),
-          ],
-          onTap: (index) {
-            fetchData();
-          },
-        ),
+  controller: tabController,
+  labelColor: Colors.black,
+  tabs: [
+    Tab(
+      child: Text(
+        "Not Started",
+        style: GLTextStyles.cabinStyle(size: 11),
+      ),
+    ),
+    Tab(
+      child: Text(
+        "In Progress",
+        style: GLTextStyles.cabinStyle(size: 11),
+      ),
+    ),
+    Tab(
+      child: Text(
+        "Review Pending",
+        style: GLTextStyles.cabinStyle(size: 11),
+      ),
+    ),
+    Tab(
+      child: Text(
+        "Review Failed",
+        style: GLTextStyles.cabinStyle(size: 11),
+      ),
+    ),
+    Tab(
+      child: Text(
+        "Completed",
+        style: GLTextStyles.cabinStyle(size: 9),
+      ),
+    ),
+  ],
+  onTap: (index) {
+    fetchData();
+  },
+),
+
         automaticallyImplyLeading: false,
         forceMaterialTransparency: true,
       ),
@@ -308,6 +309,7 @@ class _HomeScreenState extends State<HomeScreen>
                   context, widget.statusFilter ?? '');
               setState(() {});
               Navigator.pop(context);
+              fetchData();
             } catch (e) {
               log("Error changing status: $e");
             }

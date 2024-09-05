@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/presentation/attendance_screen/controller/attendance_controller.dart';
 import 'package:omnisell_worksportal/presentation/attendance_screen/view/widgets/attendence_table.dart';
+import 'package:omnisell_worksportal/presentation/attendance_screen/view/widgets/not_signed_in_table.dart';
 import 'package:provider/provider.dart';
 
 class AttendanceScreen extends StatefulWidget {
@@ -14,7 +15,9 @@ class AttendanceScreen extends StatefulWidget {
   State<AttendanceScreen> createState() => _AttendanceScreenState();
 }
 
-class _AttendanceScreenState extends State<AttendanceScreen> {
+class _AttendanceScreenState extends State<AttendanceScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
   DateTime selectedDate = DateTime.now();
 
   String formatDate(DateTime date) {
@@ -26,14 +29,30 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     setState(() {
       selectedDate = newDate;
     });
-    fetchDataForDate(selectedDate);
+    if (tabController.index == 2) {
+      // "ALL" tab
+      fetchDataForDate(selectedDate);
+    }
   }
 
   void fetchDataForDate(DateTime date) {
     log('Fetching data for date: ${formatDate(date)}');
     final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
-    final attendanceController = Provider.of<AttendanceController>(context, listen: false);
+    final attendanceController =
+        Provider.of<AttendanceController>(context, listen: false);
     attendanceController.fetchAttendance(context, formattedDate, formattedDate);
+    attendanceController.fetchNotSignedIn(context, formattedDate);
+  }
+
+  void fetchDataForTab(int index) {
+    if (index == 0) {
+      fetchDataForDate(DateTime.now()); // TODAY
+    } else if (index == 1) {
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      fetchDataForDate(yesterday); // YESTERDAY
+    } else if (index == 2) {
+      fetchDataForDate(selectedDate); // ALL
+    }
   }
 
   Future<DateTime?> showCustomDatePicker({
@@ -78,7 +97,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   @override
   void initState() {
     super.initState();
-    fetchDataForDate(selectedDate);
+    tabController = TabController(length: 3, vsync: this)
+      ..addListener(() {
+        if (tabController.indexIsChanging) {
+          fetchDataForTab(tabController.index);
+        }
+      });
+    fetchDataForTab(tabController.index);
   }
 
   @override
@@ -91,18 +116,18 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         title: Row(
           children: [
             SizedBox(
-              height: 30,
-              width: 20,
+              height: size.width*.075,
+              width: size.width*.055,
               child: Image.asset("assets/logo-sw.png"),
             ),
             const SizedBox(width: 15),
             Text("Daily Attendance", style: GLTextStyles.cabinStyle(size: 22)),
           ],
         ),
-         actions: [
+        actions: [
           IconButton(
             onPressed: () {
-              fetchDataForDate(selectedDate);
+              fetchDataForTab(tabController.index);
             },
             tooltip: "Refresh",
             icon: const Icon(
@@ -112,51 +137,92 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             ),
           ),
         ],
+        bottom: TabBar(
+          controller: tabController,
+          labelColor: Colors.black,
+          tabs: [
+            Tab(child: Text("TODAY", style: GLTextStyles.cabinStyle(size: 12))),
+            Tab(
+                child: Text("YESTERDAY",
+                    style: GLTextStyles.cabinStyle(size: 12))),
+            Tab(child: Text("ALL", style: GLTextStyles.cabinStyle(size: 12))),
+          ],
+          onTap: (index) {
+            fetchDataForTab(index);
+          },
+        ),
         automaticallyImplyLeading: false,
         forceMaterialTransparency: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
-        child: Consumer<AttendanceController>(builder: (context, controller, _) {
+        child:
+            Consumer<AttendanceController>(builder: (context, controller, _) {
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Selected Date: ${formatDate(selectedDate)}',
-                  style: GLTextStyles.cabinStyle(size: 18),
-                ),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    shape: MaterialStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
+                if (tabController.index == 0) // TODAY tab
+                  Text(
+                    'Date: ${formatDate(DateTime.now())}',
+                    style: GLTextStyles.cabinStyle(size: 16),
+                  ),
+                if (tabController.index == 1) // YESTERDAY tab
+                  Text(
+                    'Date: ${formatDate(DateTime.now().subtract(const Duration(days: 1)))}',
+                    style: GLTextStyles.cabinStyle(size: 16),
+                  ),
+                if (tabController.index == 2) // ALL tab
+                  Text(
+                    'Selected Date: ${formatDate(selectedDate)}',
+                    style: GLTextStyles.cabinStyle(size: 16),
+                  ),
+                if (tabController.index == 2) // ALL tab
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      shape: MaterialStatePropertyAll(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      backgroundColor: const MaterialStatePropertyAll(
+                        Color(0xff468585),
                       ),
                     ),
-                    backgroundColor: const MaterialStatePropertyAll(
-                      Color(0xff468585),
+                    onPressed: () => _selectDate(context),
+                    child: Text(
+                      'Change Date',
+                      style: GLTextStyles.cabinStyle(
+                        size: 16,
+                        color: Colors.white,
+                        weight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                  onPressed: () => _selectDate(context),
-                  child: Text(
-                    'Change Date',
-                    style: GLTextStyles.cabinStyle(
-                      size: 16,
-                      color: Colors.white,
-                      weight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
+                SizedBox(height: size.width*.02),
                 controller.isLoading
-                    ? const Center(child:  CircularProgressIndicator(
-                      backgroundColor: Colors.transparent,
-                      color: Color.fromARGB(255, 46, 146, 157),
-                    ),)
-                    : AttendanceTableRefactored(
-                        size: size,
-                        attendanceData: controller.attendanceData,
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.transparent,
+                          color: Color.fromARGB(255, 46, 146, 157),
+                        ),
                       )
+                    : controller.attendanceData.isEmpty
+                        ? Text(
+                            'No one is signed in yet',
+                            style: GLTextStyles.cabinStyle(
+                                size: 14, color: Colors.grey),
+                          )
+                        : AttendanceTableRefactored(
+                            size: size,
+                            attendanceData: controller.attendanceData,
+                          ),
+                SizedBox(height: size.width * .04),
+                if (controller.notSignedInData.isNotEmpty)
+                  TableForNotSignedIN(
+                    size: size,
+                    notsignedinData: controller.notSignedInData,
+                  ),
               ],
             ),
           );
