@@ -110,7 +110,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
     return Scaffold(
-      backgroundColor: const Color(0xffF6F6F6),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Row(
@@ -138,6 +138,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           ),
         ],
         bottom: TabBar(
+          indicatorColor: Color.fromARGB(255, 46, 146, 157) ,
           controller: tabController,
           labelColor: Colors.black,
           tabs: [
@@ -155,7 +156,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         forceMaterialTransparency: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.only(
+                    left: 10, right: 10, bottom: 5, top: 5),
         child:
             Consumer<AttendanceController>(builder: (context, controller, _) {
           return SingleChildScrollView(

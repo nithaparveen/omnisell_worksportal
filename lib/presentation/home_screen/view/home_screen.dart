@@ -78,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen>
     var size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: const Color(0xffF6F6F6),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Row(
@@ -99,45 +99,47 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ],
         bottom: TabBar(
-  controller: tabController,
-  labelColor: Colors.black,
-  tabs: [
-    Tab(
-      child: Text(
-        "Not Started",
-        style: GLTextStyles.cabinStyle(size: 11),
-      ),
-    ),
-    Tab(
-      child: Text(
-        "In Progress",
-        style: GLTextStyles.cabinStyle(size: 11),
-      ),
-    ),
-    Tab(
-      child: Text(
-        "Review Pending",
-        style: GLTextStyles.cabinStyle(size: 11),
-      ),
-    ),
-    Tab(
-      child: Text(
-        "Review Failed",
-        style: GLTextStyles.cabinStyle(size: 11),
-      ),
-    ),
-    Tab(
-      child: Text(
-        "Completed",
-        style: GLTextStyles.cabinStyle(size: 9),
-      ),
-    ),
-  ],
-  onTap: (index) {
-    fetchData();
-  },
-),
-
+          enableFeedback: false,
+          indicatorColor: Color.fromARGB(255, 46, 146, 157) ,
+          isScrollable: true,
+          controller: tabController,
+          labelColor: Colors.black,
+          tabs: [
+            Tab(
+              child: Text(
+                "Not Started",
+                style: GLTextStyles.cabinStyle(size: 11),
+              ),
+            ),
+            Tab(
+              child: Text(
+                "In Progress",
+                style: GLTextStyles.cabinStyle(size: 11),
+              ),
+            ),
+            Tab(
+              child: Text(
+                "Review Pending",
+                style: GLTextStyles.cabinStyle(size: 11),
+              ),
+            ),
+            Tab(
+              child: Text(
+                "Review Failed",
+                style: GLTextStyles.cabinStyle(size: 11),
+              ),
+            ),
+            Tab(
+              child: Text(
+                "Completed",
+                style: GLTextStyles.cabinStyle(size: 9),
+              ),
+            ),
+          ],
+          onTap: (index) {
+            fetchData();
+          },
+        ),
         automaticallyImplyLeading: false,
         forceMaterialTransparency: true,
       ),
@@ -192,8 +194,8 @@ class _HomeScreenState extends State<HomeScreen>
                           onTap: () => showTaskDetailBottomSheet(
                               context, task, currentColor),
                           child: Card(
-                            color: ColorTheme.white,
-                            elevation: 1,
+                            surfaceTintColor: ColorTheme.white,
+                            elevation: 2,
                             child: Padding(
                               padding: const EdgeInsets.all(20),
                               child: Column(
