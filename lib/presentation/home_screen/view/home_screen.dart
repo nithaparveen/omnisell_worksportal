@@ -189,7 +189,6 @@ class _HomeScreenState extends State<HomeScreen>
                         String currentStatus = task.status ?? 'Not Started';
                         Color currentColor =
                             statusColors[currentStatus] ?? Colors.grey;
-
                         return InkWell(
                           onTap: () => showTaskDetailBottomSheet(
                               context, task, currentColor),

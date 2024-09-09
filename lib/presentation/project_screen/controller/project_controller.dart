@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:omnisell_worksportal/core/constants/colors.dart';
 import 'package:omnisell_worksportal/core/utils/app_utils.dart';
+import 'package:omnisell_worksportal/repository/api/project_screen/model/login_model.dart';
 import 'package:omnisell_worksportal/repository/api/project_screen/model/project_model.dart';
 import 'package:omnisell_worksportal/repository/api/project_screen/service/project_service.dart';
 
@@ -10,6 +11,8 @@ class ProjectController extends ChangeNotifier {
   int currentPage = 1;
 
   ProjectModel projectModel = ProjectModel();
+  LoginModel loginModel = LoginModel();
+
 
   Future<void> fetchProjects(BuildContext context) async {
     isLoading = true;

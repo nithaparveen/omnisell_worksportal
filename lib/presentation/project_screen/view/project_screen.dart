@@ -136,9 +136,13 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => ProjectDetailScreen(
-                                projectId: controller
-                                        .projectModel.data?.data?[index].id ??
-                                    0,))),
+                                  projectId: controller
+                                          .projectModel.data?.data?[index].id ??
+                                      0,
+                                  userId: controller
+                                          .loginModel.data?.user?.userId ??
+                                      0,
+                                ))),
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),

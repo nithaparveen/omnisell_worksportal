@@ -7,8 +7,9 @@ import 'package:omnisell_worksportal/presentation/project_detail_screen/view/wid
 import 'package:omnisell_worksportal/presentation/project_detail_screen/view/widgets/tasks_screen.dart';
 
 class ProjectDetailScreen extends StatefulWidget {
-  const ProjectDetailScreen({super.key, required this.projectId});
+  const ProjectDetailScreen({super.key, required this.projectId, required this.userId});
   final int  projectId;
+  final int userId;
 
   @override
   State<ProjectDetailScreen> createState() => _ProjectDetailScreenState();
@@ -86,8 +87,8 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
         controller: tabController,
         children:  [
           DetailsScreen(projectId: widget.projectId),
-          TasksScreen(),
-          ActivitiesScreen(),
+          TasksScreen(projectId: widget.projectId),
+          ActivitiesScreen(projectId: widget.projectId, userId: widget.userId),
           MembersScreen(),
         ],
       ),

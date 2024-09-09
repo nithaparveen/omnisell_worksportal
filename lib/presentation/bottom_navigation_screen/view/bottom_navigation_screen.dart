@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:omnisell_worksportal/core/constants/colors.dart';
 import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/presentation/attendance_screen/view/attendance_screen.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/view/home_screen.dart';

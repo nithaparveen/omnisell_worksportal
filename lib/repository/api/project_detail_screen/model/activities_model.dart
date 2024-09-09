@@ -1,25 +1,25 @@
 // To parse this JSON data, do
 //
-//     final activitiesModel = activitiesModelFromJson(jsonString);
+//     final projectActivitiesModel = projectActivitiesModelFromJson(jsonString);
 
 import 'dart:convert';
 
-ActivitiesModel activitiesModelFromJson(String str) => ActivitiesModel.fromJson(json.decode(str));
+ProjectActivitiesModel projectActivitiesModelFromJson(String str) => ProjectActivitiesModel.fromJson(json.decode(str));
 
-String activitiesModelToJson(ActivitiesModel data) => json.encode(data.toJson());
+String projectActivitiesModelToJson(ProjectActivitiesModel data) => json.encode(data.toJson());
 
-class ActivitiesModel {
+class ProjectActivitiesModel {
     String? status;
     Data? data;
     dynamic message;
 
-    ActivitiesModel({
+    ProjectActivitiesModel({
         this.status,
         this.data,
         this.message,
     });
 
-    factory ActivitiesModel.fromJson(Map<String, dynamic> json) => ActivitiesModel(
+    factory ProjectActivitiesModel.fromJson(Map<String, dynamic> json) => ProjectActivitiesModel(
         status: json["status"],
         data: json["data"] == null ? null : Data.fromJson(json["data"]),
         message: json["message"],

@@ -4,7 +4,7 @@ import '../../../../core/utils/app_utils.dart';
 import '../../../helper/api_helper.dart';
 
 class ProjectDetailsService {
-  
+
   static Future<dynamic> fetchDetails(projectId) async {
     log("ProjectDetailsService -> fetchDetails()");
     try {
@@ -38,6 +38,19 @@ class ProjectDetailsService {
     try {
       var decodedData = await ApiHelper.getData(
         endPoint: "projects/tasks?projects_id=$projectId",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+    return {};
+  }
+  static Future<dynamic> fetchMembers(projectId) async {
+    log("ProjectDetailsService -> fetchMembers()");
+    try {
+      var decodedData = await ApiHelper.getData(
+        endPoint: "projects/employees?projects_id=$projectId",
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData;
