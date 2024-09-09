@@ -135,7 +135,10 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ProjectDetailScreen())),
+                            builder: (context) => ProjectDetailScreen(
+                                projectId: controller
+                                        .projectModel.data?.data?[index].id ??
+                                    0,))),
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:omnisell_worksportal/presentation/attendance_screen/controller/attendance_controller.dart';
 import 'package:omnisell_worksportal/presentation/bottom_navigation_screen/controller/bottom_navigation_controller.dart';
 import 'package:omnisell_worksportal/presentation/bottom_navigation_screen/view/bottom_navigation_screen.dart';
+import 'package:omnisell_worksportal/presentation/project_detail_screen/controller/project_detail_controller.dart';
 import 'package:omnisell_worksportal/presentation/project_screen/controller/project_controller.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +25,7 @@ void main() async {
       ChangeNotifierProvider(create: (context) => BottomNavigationController()),
       ChangeNotifierProvider(create: (context) => AttendanceController()),
       ChangeNotifierProvider(create: (context) => ProjectController()),
+      ChangeNotifierProvider(create: (context) => ProjectDetailsController()),
     ],
     child: MyApp(isLoggedIn: loggedIn, userId: userId),
   ));

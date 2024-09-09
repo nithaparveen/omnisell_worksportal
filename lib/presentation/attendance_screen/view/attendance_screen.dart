@@ -138,7 +138,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           ),
         ],
         bottom: TabBar(
-          indicatorColor: Color.fromARGB(255, 46, 146, 157) ,
+          indicatorColor: const Color.fromARGB(255, 46, 146, 157) ,
           controller: tabController,
           labelColor: Colors.black,
           tabs: [
