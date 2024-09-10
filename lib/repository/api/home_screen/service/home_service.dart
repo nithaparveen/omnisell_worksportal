@@ -11,7 +11,6 @@ class HomeService {
       if (status != null && status.isNotEmpty) {
         endPoint += "&status=$status";
       }
-
       var decodedData = await ApiHelper.getData(
         endPoint: endPoint,
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),

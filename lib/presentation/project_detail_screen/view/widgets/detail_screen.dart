@@ -62,82 +62,81 @@ class _DetailsScreenState extends State<DetailsScreen> {
           surfaceTintColor: Colors.white,
           elevation: 2,
           child: Padding(
-            padding:
-                const EdgeInsets.only(left: 18, right: 18, top: 20, bottom: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GLRichText(
-                  fontSize: 16,
-                  label: "Client",
-                  value: controller.detailsModel.data?.account?.accountName !=
-                          null
-                      ? "${controller.detailsModel.data?.account?.accountName}"
-                      : "",
-                ),
-                SizedBox(height: size.height * .02),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GLRichText(
+              padding: const EdgeInsets.only(
+                  left: 18, right: 18, top: 20, bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GLRichText(
+                    fontSize: 16,
+                    label: "Client",
+                    value: controller.detailsModel.data?.account?.accountName ??
+                        "",
+                  ),
+                  SizedBox(height: size.height * .02),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GLRichText(
                         fontSize: 14,
                         label: "Start Date",
                         value: controller.detailsModel.data?.startDate != null
                             ? DateFormat('dd.MM.yyyy').format(DateTime.parse(
-                                "${controller.detailsModel.data?.startDate}"))
-                            : ""),
-                    if (controller.detailsModel.data?.endDate != null)
-                      GLRichText(
+                                "${controller.detailsModel.data!.startDate!}"))
+                            : "",
+                      ),
+                      if (controller.detailsModel.data?.endDate != null)
+                        GLRichText(
                           fontSize: 14,
                           label: "End Date",
                           value: controller.detailsModel.data?.endDate != null
                               ? DateFormat('dd.MM.yyyy').format(DateTime.parse(
-                                  "${controller.detailsModel.data?.endDate}"))
-                              : ""),
+                                  controller.detailsModel.data!.endDate!))
+                              : "",
+                        ),
+                    ],
+                  ),
+                  SizedBox(height: size.height * .005),
+                  const Divider(thickness: 0.8),
+                  const Text(
+                    "Scope:",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: size.height * .02),
+                  Wrap(
+                    spacing: 20,
+                    runSpacing: 10,
+                    children: scopeNames.map((scopeName) {
+                      return ScopeItem(
+                        name: scopeName,
+                        status: isScopePresent(scopeName),
+                      );
+                    }).toList(),
+                  ),
+                  SizedBox(height: size.height * .005),
+                  if (controller.detailsModel.data?.country?.name != null) ...[
+                    const Divider(thickness: 0.8),
+                    GLRichText(
+                      label: "Country",
+                      value: controller.detailsModel.data?.country?.name ?? "",
+                      fontSize: 16,
+                    ),
+                    SizedBox(height: size.height * .005),
                   ],
-                ),
-                SizedBox(height: size.height * .005),
-                const Divider(thickness: 0.8),
-                const Text(
-                  "Scope:",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: size.height * .02),
-                Wrap(
-                  spacing: 20,
-                  runSpacing: 10,
-                  children: scopeNames.map((scopeName) {
-                    return ScopeItem(
-                      name: scopeName,
-                      status: isScopePresent(scopeName),
-                    );
-                  }).toList(),
-                ),
-                SizedBox(height: size.height * .005),
-                if (controller.detailsModel.data?.country?.name != null)
-                  const Divider(thickness: 0.8),
-                if (controller.detailsModel.data?.country?.name != null)
-                  GLRichText(
-                    label: "Country",
-                    value: controller.detailsModel.data?.country?.name ?? "",
-                    fontSize: 16,
-                  ),
-                SizedBox(height: size.height * .005),
-                if (controller.detailsModel.data?.description != null)
-                  const Divider(thickness: 0.8),
-                if (controller.detailsModel.data?.description != null)
-                  GLRichText(
-                    label: "Description",
-                    value: controller.detailsModel.data?.description ?? "",
-                    fontSize: 16,
-                  ),
-              ],
-            ),
-          ),
+                  if (controller.detailsModel.data?.description != null) ...[
+                    const Divider(thickness: 0.8),
+                    GLRichText(
+                      label: "Description",
+                      value: controller.detailsModel.data?.description ?? "",
+                      fontSize: 16,
+                    ),
+                  ],
+                ],
+              )),
         ),
       );
     });

@@ -17,7 +17,9 @@ class AttendanceTableRefactored extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
-    final DateFormat formatter = DateFormat('HH:mm');
+    final DateFormat timeFormatter = DateFormat('hh:mm aa');
+    final DateFormat dateFormatter = DateFormat('dd-MM-yyy');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -38,7 +40,7 @@ class AttendanceTableRefactored extends StatelessWidget {
               columns: [
                 DataColumn(
                     label: Text(
-                  'NAME',
+                  'DATE',
                   textAlign: TextAlign.center,
                   style: GLTextStyles.cabinStyle(size: 14),
                 )),
@@ -70,11 +72,11 @@ class AttendanceTableRefactored extends StatelessWidget {
             
                 return DataRow(
                   cells: [
-                    DataCell(Text(data.name ?? '')),
+                    DataCell(Text(createdAt != null ? dateFormatter.format(createdAt) : "")),
                     DataCell(Text(
-                        createdAt != null ? formatter.format(createdAt) : "")),
+                        createdAt != null ? timeFormatter.format(createdAt) : "")),
                     DataCell(Text(loggedOutTime != null
-                        ? formatter.format(loggedOutTime)
+                        ? timeFormatter.format(loggedOutTime)
                         : '-')),
                   ],
                 );

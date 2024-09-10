@@ -147,6 +147,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         builder: (context) => ProjectDetailScreen(
                           projectId: project?.id ?? 0,
                           userId: userId ?? 0,
+                          projectName: project?.name ?? "",
                         ),
                       ),
                     ),
@@ -166,13 +167,13 @@ class _ProjectScreenState extends State<ProjectScreen> {
                               children: [
                                 Text(
                                   project?.name ?? '',
-                                  maxLines: 2,
+                                  maxLines: 3,
                                   style: GLTextStyles.interStyle(size: 15),
                                 ),
                                 SizedBox(height: size.width * .015),
                                 Text(
                                   project?.account?.accountName ?? '',
-                                  maxLines: 2,
+                                  maxLines: 3,
                                   style: GLTextStyles.interStyle(
                                     size: 13,
                                     weight: FontWeight.w500,

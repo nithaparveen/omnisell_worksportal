@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/presentation/project_detail_screen/view/widgets/activities_screen.dart';
@@ -8,9 +7,13 @@ import 'package:omnisell_worksportal/presentation/project_detail_screen/view/wid
 
 class ProjectDetailScreen extends StatefulWidget {
   const ProjectDetailScreen(
-      {super.key, required this.projectId, required this.userId});
+      {super.key,
+      required this.projectId,
+      required this.userId,
+      required this.projectName});
   final int projectId;
   final int userId;
+  final String projectName;
 
   @override
   State<ProjectDetailScreen> createState() => _ProjectDetailScreenState();
@@ -34,7 +37,6 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
 
   @override
   Widget build(BuildContext context) {
-    // var size = MediaQuery.sizeOf(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -47,8 +49,8 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
               size: 20,
             )),
         title: Text(
-          "Project Details",
-          style: GLTextStyles.cabinStyle(size: 20),
+          widget.projectName,
+          style: GLTextStyles.cabinStyle(size: 18),
         ),
         // actions: [
         //   IconButton(
