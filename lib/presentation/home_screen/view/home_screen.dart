@@ -100,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen>
         ],
         bottom: TabBar(
           enableFeedback: false,
-          indicatorColor: Color.fromARGB(255, 46, 146, 157) ,
+          indicatorColor: const Color.fromARGB(255, 46, 146, 157) ,
           isScrollable: true,
           controller: tabController,
           labelColor: Colors.black,
@@ -283,46 +283,42 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  void showTaskDetailBottomSheet(
-      BuildContext context, task, Color statusColor) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return TaskDetailBottomSheet(
-          title: task?.title ?? 'No Title',
-          projectName: task?.project?.name ?? 'No Project',
-          assignedBy: task?.assignedByUser?.name ?? 'Unknown',
-          dueDate: formatDate(task?.dueDate),
-          status: task?.status ?? 'Not Started',
-          statusColor: statusColor,
-          priority: getPriorityLabel(task?.priority ?? 0),
-          reviewer: task?.reviewer?.name ?? 'Unknown',
-          description: cleanDescription(task?.description ?? ''),
-          onStatusChange: (String newStatus) async {
-            final int taskId = task?.id ?? 0;
-            const String statusNote = 'Some Note';
-            try {
-              final homeController =
-                  Provider.of<HomeController>(context, listen: false);
-              await homeController.changeStatus(
-                  context, taskId, newStatus, statusNote);
-              await homeController.fetchTasksByStatus(
-                  context, widget.statusFilter ?? '');
-              setState(() {});
-              Navigator.pop(context);
-              fetchData();
-            } catch (e) {
-              log("Error changing status: $e");
-            }
+  void showTaskDetailBottomSheet(BuildContext context, task, Color statusColor) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return TaskDetailBottomSheet(
+        title: task?.title ?? 'No Title',
+        projectName: task?.project?.name ?? 'No Project',
+        assignedBy: task?.assignedByUser?.name ?? 'Unknown',
+        dueDate: formatDate(task?.dueDate),
+        status: task?.status ?? 'Not Started',
+        statusColor: statusColor,
+        priority: getPriorityLabel(task?.priority ?? 0),
+        reviewer: task?.reviewer?.name ?? 'Unknown',
+        description: cleanDescription(task?.description ?? ''),
+        onStatusChange: (String newStatus, String remark, ) async {
+          final int taskId = task?.id ?? 0;
+          try {
+            final homeController = Provider.of<HomeController>(context, listen: false);
+            await homeController.changeStatus(context, taskId, newStatus, remark);
+            await homeController.fetchTasksByStatus(context, widget.statusFilter ?? '');
             setState(() {});
-          },
-        );
-      },
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-      ),
-    );
-  }
+            Navigator.pop(context);
+            fetchData();
+          } catch (e) {
+            log("Error changing status: $e");
+          }
+          setState(() {});
+        },
+      );
+    },
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+    ),
+  );
+}
+
 
   String formatDate(DateTime? dueDate) {
     return dueDate != null

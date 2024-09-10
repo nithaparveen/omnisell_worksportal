@@ -46,44 +46,45 @@ class HomeController extends ChangeNotifier {
     }
   }
 
-  Future<void> changeStatus(
-      BuildContext context, int id, String status, String? note) async {
-    var size = MediaQuery.sizeOf(context);
-    isStatusLoading = true;
-    notifyListeners();
-    print("Changing status for task ID: $id to $status");
+ Future<void> changeStatus(
+    BuildContext context, int id, String status, String? remark) async {
+  var size = MediaQuery.sizeOf(context);
+  isStatusLoading = true;
+  notifyListeners();
+  print("Changing status for task ID: $id to $status");
 
-    try {
-      final value = await HomeService.changeStatus(id, status, note);
-      if (value != null && value["status"] == "success") {
-        updateTaskStatus(id, status);
-        Flushbar(
-          maxWidth: size.width * .65,
-          backgroundColor: Color.fromARGB(255, 97, 182, 86),
-          icon: Icon(
-            Icons.done_sharp,
-            color: ColorTheme.white,
-            size: 18,
-          ),
-          messageText: Text(
-            "Status updated successfully",
-            style: GLTextStyles.openSans(size: 14, weight: FontWeight.w500,color: ColorTheme.white),
-          ),
-          duration: const Duration(seconds: 3),
-          flushbarPosition: FlushbarPosition.BOTTOM,
-        ).show(context);
-      } else {
-        AppUtils.oneTimeSnackBar("Unable to update status",
-            context: context, bgColor: ColorTheme.red);
-      }
-    } catch (e) {
-      AppUtils.oneTimeSnackBar("An error occurred",
+  try {
+    final value = await HomeService.changeStatus(id, status, remark);
+    if (value != null && value["status"] == "success") {
+      updateTaskStatus(id, status);
+      Flushbar(
+        maxWidth: size.width * .65,
+        backgroundColor: Color.fromARGB(255, 97, 182, 86),
+        icon: Icon(
+          Icons.done_sharp,
+          color: ColorTheme.white,
+          size: 18,
+        ),
+        messageText: Text(
+          "Status updated successfully",
+          style: GLTextStyles.openSans(size: 14, weight: FontWeight.w500, color: ColorTheme.white),
+        ),
+        duration: const Duration(seconds: 3),
+        flushbarPosition: FlushbarPosition.BOTTOM,
+      ).show(context);
+    } else {
+      AppUtils.oneTimeSnackBar("Unable to update status",
           context: context, bgColor: ColorTheme.red);
-    } finally {
-      isStatusLoading = false;
-      notifyListeners();
     }
+  } catch (e) {
+    AppUtils.oneTimeSnackBar("An error occurred",
+        context: context, bgColor: ColorTheme.red);
+  } finally {
+    isStatusLoading = false;
+    notifyListeners();
   }
+}
+
 
   void updateTaskStatus(int id, String newStatus) async {
     final taskIndex = taskModel.data?.data?.indexWhere((task) => task.id == id);

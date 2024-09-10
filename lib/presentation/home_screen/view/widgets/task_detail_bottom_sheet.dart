@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 
-class TaskDetailBottomSheet extends StatelessWidget {
+class TaskDetailBottomSheet extends StatefulWidget {
   final String title;
   final String projectName;
   final String assignedBy;
@@ -10,7 +11,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
   final String priority;
   final String reviewer;
   final String description;
-  final Function(String) onStatusChange;
+  final Function(String, String) onStatusChange;
 
   TaskDetailBottomSheet({
     super.key,
@@ -25,6 +26,13 @@ class TaskDetailBottomSheet extends StatelessWidget {
     required this.description,
     required this.onStatusChange,
   });
+
+  @override
+  _TaskDetailBottomSheetState createState() => _TaskDetailBottomSheetState();
+}
+
+class _TaskDetailBottomSheetState extends State<TaskDetailBottomSheet> {
+  final TextEditingController _remarkController = TextEditingController();
 
   final Map<String, Color> _statusColors = {
     'Not Started': Colors.grey,
@@ -64,7 +72,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
                     ),
                     Flexible(
                       child: Text(
-                        projectName,
+                        widget.projectName,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
@@ -77,7 +85,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  title,
+                  widget.title,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
@@ -100,7 +108,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          assignedBy,
+                          widget.assignedBy,
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w400,
@@ -117,7 +125,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          reviewer,
+                          widget.reviewer,
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w400,
@@ -134,7 +142,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          dueDate,
+                          widget.dueDate,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
@@ -151,7 +159,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          priority,
+                          widget.priority,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
@@ -163,7 +171,57 @@ class TaskDetailBottomSheet extends StatelessWidget {
                     ),
                     PopupMenuButton<String>(
                       onSelected: (String newStatus) {
-                        onStatusChange(newStatus);
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text("Change status of task",
+                                  style: GLTextStyles.cabinStyle(size: 16)),
+                              content: SizedBox(
+                                width: double
+                                    .maxFinite, // Ensures the dialog takes up full width
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                          "Please submit remarks on this task. You can leave it blank if you want.",
+                                          style: GLTextStyles.cabinStyle(
+                                              size: 14,
+                                              weight: FontWeight.w400)),
+                                      const SizedBox(height: 16),
+                                      TextField(
+                                        controller: _remarkController,
+                                        decoration: const InputDecoration(
+                                          hintText: 'Remarks',
+                                        ),
+                                        maxLines: null, // Allows multiple lines
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    widget.onStatusChange(
+                                        newStatus, _remarkController.text);
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                       itemBuilder: (BuildContext context) {
                         return _statusColors.keys.map((String status) {
@@ -198,11 +256,11 @@ class TaskDetailBottomSheet extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5),
-                          color: statusColor,
+                          color: widget.statusColor,
                         ),
                         child: Center(
                           child: Text(
-                            status,
+                            widget.status,
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
@@ -214,7 +272,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (description.isNotEmpty) ...[
+                if (widget.description.isNotEmpty) ...[
                   const Text(
                     "Description",
                     style: TextStyle(
@@ -225,7 +283,7 @@ class TaskDetailBottomSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    description,
+                    widget.description,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
