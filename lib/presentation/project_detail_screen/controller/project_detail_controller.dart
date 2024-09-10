@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:omnisell_worksportal/core/constants/colors.dart';
 import 'package:omnisell_worksportal/core/utils/app_utils.dart';
 import 'package:omnisell_worksportal/repository/api/project_detail_screen/model/activities_model.dart';
+import 'package:omnisell_worksportal/repository/api/project_detail_screen/model/members_model.dart';
 import 'package:omnisell_worksportal/repository/api/project_detail_screen/model/project_detail_model.dart';
 import 'package:omnisell_worksportal/repository/api/project_detail_screen/model/tasks_model.dart';
 import 'package:omnisell_worksportal/repository/api/project_detail_screen/service/project_detail_service.dart';
@@ -10,6 +11,7 @@ class ProjectDetailsController extends ChangeNotifier {
   DetailsModel detailsModel = DetailsModel();
   TasksModel tasksModel = TasksModel();
   ProjectActivitiesModel projectActivitiesModel = ProjectActivitiesModel();
+  MembersModel membersModel = MembersModel();
 
   bool isLoading = false;
   bool isTasksLoading = false;
@@ -58,6 +60,21 @@ class ProjectDetailsController extends ChangeNotifier {
       AppUtils.oneTimeSnackBar("Unable to fetch Data",
           context: context, bgColor: ColorTheme.red);
       isActivitiesLoading = false;
+    }
+    notifyListeners();
+  }
+
+  Future<void> fetchMembers(BuildContext context, projectId) async {
+    isMembersLoading = true;
+    notifyListeners();
+    final value = await ProjectDetailsService.fetchMembers(projectId);
+    if (value != null && value["status"] == "success") {
+      membersModel = MembersModel.fromJson(value);
+      isMembersLoading = false;
+    } else {
+      AppUtils.oneTimeSnackBar("Unable to fetch Data",
+          context: context, bgColor: ColorTheme.red);
+      isMembersLoading = false;
     }
     notifyListeners();
   }

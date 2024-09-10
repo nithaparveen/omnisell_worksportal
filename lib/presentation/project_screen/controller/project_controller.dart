@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:omnisell_worksportal/core/constants/colors.dart';
 import 'package:omnisell_worksportal/core/utils/app_utils.dart';
-import 'package:omnisell_worksportal/repository/api/project_screen/model/login_model.dart';
 import 'package:omnisell_worksportal/repository/api/project_screen/model/project_model.dart';
 import 'package:omnisell_worksportal/repository/api/project_screen/service/project_service.dart';
 
@@ -11,13 +10,11 @@ class ProjectController extends ChangeNotifier {
   int currentPage = 1;
 
   ProjectModel projectModel = ProjectModel();
-  LoginModel loginModel = LoginModel();
-
 
   Future<void> fetchProjects(BuildContext context) async {
     isLoading = true;
     notifyListeners();
-    
+
     final value = await ProjectService.fetchProjects();
     if (value != null && value["status"] == "success") {
       projectModel = ProjectModel.fromJson(value);
@@ -39,7 +36,7 @@ class ProjectController extends ChangeNotifier {
 
     if (value != null && value["status"] == "success") {
       final moreProjects = ProjectModel.fromJson(value);
-      
+
       projectModel.data?.data?.addAll(moreProjects.data?.data ?? []);
     } else {
       AppUtils.oneTimeSnackBar("Unable to fetch more data",

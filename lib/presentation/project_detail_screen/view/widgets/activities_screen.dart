@@ -22,7 +22,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
     super.initState();
   }
 
- void fetchData() async {
+  void fetchData() async {
     await Provider.of<ProjectDetailsController>(context, listen: false)
         .fetchActivities(context, widget.projectId, widget.userId);
   }
@@ -41,6 +41,14 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
           style: GLTextStyles.cabinStyle(
               size: 16, weight: FontWeight.w400, color: Colors.grey),
         ));
+      }
+      if (controller.isActivitiesLoading) {
+        return const Center(
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.transparent,
+            color: Color.fromARGB(255, 46, 146, 157),
+          ),
+        );
       }
       return ListView.separated(
         itemCount: activitiesList.length,

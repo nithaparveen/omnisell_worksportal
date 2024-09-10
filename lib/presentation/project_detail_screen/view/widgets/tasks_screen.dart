@@ -16,9 +16,13 @@ class TasksScreen extends StatefulWidget {
 class _TasksScreenState extends State<TasksScreen> {
   @override
   void initState() {
-    Provider.of<ProjectDetailsController>(context, listen: false)
-        .fetchTasks(context, widget.projectId);
+    fetchData();
     super.initState();
+  }
+
+  void fetchData()async{
+    await Provider.of<ProjectDetailsController>(context, listen: false)
+        .fetchTasks(context, widget.projectId);
   }
 
   @override
@@ -34,6 +38,14 @@ class _TasksScreenState extends State<TasksScreen> {
           style: GLTextStyles.cabinStyle(
               size: 16, weight: FontWeight.w400, color: Colors.grey),
         ));
+      }
+      if (controller.isTasksLoading) {
+        return const Center(
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.transparent,
+            color: Color.fromARGB(255, 46, 146, 157),
+          ),
+        );
       }
       return ListView.separated(
         itemCount: taskList.length,

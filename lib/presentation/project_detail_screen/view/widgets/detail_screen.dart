@@ -15,9 +15,13 @@ class DetailsScreen extends StatefulWidget {
 class _DetailsScreenState extends State<DetailsScreen> {
   @override
   void initState() {
-    Provider.of<ProjectDetailsController>(context, listen: false)
-        .fetchDetails(context, widget.projectId);
+    fetchData();
     super.initState();
+  }
+
+  void fetchData() async {
+    await Provider.of<ProjectDetailsController>(context, listen: false)
+        .fetchDetails(context, widget.projectId);
   }
 
   @override
@@ -41,6 +45,15 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
       bool isScopePresent(String scopeName) {
         return apiScopes.any((scope) => scope.scope == scopeName);
+      }
+
+      if (controller.isLoading) {
+        return const Center(
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.transparent,
+            color: Color.fromARGB(255, 46, 146, 157),
+          ),
+        );
       }
 
       return Padding(
