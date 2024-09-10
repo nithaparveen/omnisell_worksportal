@@ -28,22 +28,24 @@ class _MembersScreenState extends State<MembersScreen> {
     var size = MediaQuery.sizeOf(context);
     return Consumer<ProjectDetailsController>(
         builder: (context, controller, _) {
-      if (controller.membersModel.data!.data!.isEmpty) {
-        return Center(
-            child: Text(
-          "No members added for this project",
-          style: GLTextStyles.cabinStyle(
-              size: 16, weight: FontWeight.w400, color: Colors.grey),
-        ));
-      }
       if (controller.isMembersLoading) {
-        return const Center(
-          child: CircularProgressIndicator(
-            backgroundColor: Colors.transparent,
-            color: Color.fromARGB(255, 46, 146, 157),
-          ),
-        );
-      }
+      return const Center(
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.transparent,
+          color: Color.fromARGB(255, 46, 146, 157),
+        ),
+      );
+    }
+    if (controller.membersModel.data == null ||
+        controller.membersModel.data!.data == null ||
+        controller.membersModel.data!.data!.isEmpty) {
+      return Center(
+          child: Text(
+        "No members added for this project",
+        style: GLTextStyles.cabinStyle(
+            size: 16, weight: FontWeight.w400, color: Colors.grey),
+      ));
+    }
       return Padding(
         padding: const EdgeInsets.only(left: 12, right: 12, top: 5),
         child: ListView.separated(

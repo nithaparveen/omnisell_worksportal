@@ -46,10 +46,10 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
               Icons.arrow_back_ios,
               size: 20,
             )),
-        // title: Text(
-        //   "ProjectName",
-        //   style: GLTextStyles.cabinStyle(size: 22),
-        // ),
+        title: Text(
+          "Project Details",
+          style: GLTextStyles.cabinStyle(size: 20),
+        ),
         // actions: [
         //   IconButton(
         //     onPressed: () {

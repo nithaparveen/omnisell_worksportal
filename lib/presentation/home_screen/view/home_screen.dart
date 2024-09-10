@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen>
             Tab(
               child: Text(
                 "Completed",
-                style: GLTextStyles.cabinStyle(size: 9),
+                style: GLTextStyles.cabinStyle(size: 11),
               ),
             ),
           ],
