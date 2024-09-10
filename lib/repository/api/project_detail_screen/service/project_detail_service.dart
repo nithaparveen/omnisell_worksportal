@@ -4,7 +4,6 @@ import '../../../../core/utils/app_utils.dart';
 import '../../../helper/api_helper.dart';
 
 class ProjectDetailsService {
-
   static Future<dynamic> fetchDetails(projectId) async {
     log("ProjectDetailsService -> fetchDetails()");
     try {
@@ -46,6 +45,7 @@ class ProjectDetailsService {
     }
     return {};
   }
+
   static Future<dynamic> fetchMembers(projectId) async {
     log("ProjectDetailsService -> fetchMembers()");
     try {

@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:omnisell_worksportal/app_config/app_config.dart';
 import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/presentation/project_detail_screen/view/project_detail_screen.dart';
 import 'package:omnisell_worksportal/presentation/project_screen/controller/project_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProjectScreen extends StatefulWidget {
   const ProjectScreen({super.key});
@@ -14,21 +16,29 @@ class ProjectScreen extends StatefulWidget {
 }
 
 class _ProjectScreenState extends State<ProjectScreen> {
-  late ScrollController _scrollController; // Late initialization
+  late ScrollController scrollController;
+  int? userId;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController(); // Initialize ScrollController here
-    _scrollController.addListener(_onScroll);
+    scrollController = ScrollController();
+    scrollController.addListener(onScroll);
+    fetchUserId();
     fetchData();
+  }
+
+  Future<void> fetchUserId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getInt(AppConfig.userId);
+    });
   }
 
   @override
   void dispose() {
-    _scrollController
-        .removeListener(_onScroll); // Remove the listener when disposing
-    _scrollController.dispose(); // Dispose of the controller
+    scrollController.removeListener(onScroll);
+    scrollController.dispose();
     super.dispose();
   }
 
@@ -38,10 +48,9 @@ class _ProjectScreenState extends State<ProjectScreen> {
     setState(() {});
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      // Fetch more projects when the user reaches the bottom of the scroll
+  void onScroll() {
+    if (scrollController.position.pixels ==
+        scrollController.position.maxScrollExtent) {
       Provider.of<ProjectController>(context, listen: false)
           .fetchMoreProjects(context);
     }
@@ -101,7 +110,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: GridView.builder(
-                controller: _scrollController, // Assign the ScrollController
+                controller: scrollController,
                 padding: EdgeInsets.zero,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -133,16 +142,14 @@ class _ProjectScreenState extends State<ProjectScreen> {
 
                   return InkWell(
                     onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProjectDetailScreen(
-                                  projectId: controller
-                                          .projectModel.data?.data?[index].id ??
-                                      0,
-                                  userId: controller
-                                          .loginModel.data?.user?.userId ??
-                                      0,
-                                ))),
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProjectDetailScreen(
+                          projectId: project?.id ?? 0,
+                          userId: userId ?? 0,
+                        ),
+                      ),
+                    ),
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),

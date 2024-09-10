@@ -6,7 +6,8 @@ import 'package:omnisell_worksportal/presentation/project_detail_screen/controll
 import 'package:provider/provider.dart';
 
 class ActivitiesScreen extends StatefulWidget {
-  const ActivitiesScreen({super.key, required this.projectId, required this.userId});
+  const ActivitiesScreen(
+      {super.key, required this.projectId, required this.userId});
   final int projectId;
   final int userId;
 
@@ -15,10 +16,15 @@ class ActivitiesScreen extends StatefulWidget {
 }
 
 class _ActivitiesScreenState extends State<ActivitiesScreen> {
-    @override
+  @override
   void initState() {
-   Provider.of<ProjectDetailsController>(context,listen: false).fetchActivities(context, widget.projectId, widget.userId);
+    fetchData();
     super.initState();
+  }
+
+ void fetchData() async {
+    await Provider.of<ProjectDetailsController>(context, listen: false)
+        .fetchActivities(context, widget.projectId, widget.userId);
   }
 
   @override

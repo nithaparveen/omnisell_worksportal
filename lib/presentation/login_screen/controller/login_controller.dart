@@ -61,7 +61,7 @@ class LoginController extends ChangeNotifier {
   }
 
   Future<void> storeUserId(int userId) async {
-    log("storeUserId()");
+    log("storeUserId() -> $userId");
     sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setInt(AppConfig.userId, userId);
   }
