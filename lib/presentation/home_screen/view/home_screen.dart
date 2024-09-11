@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_worksportal/core/constants/colors.dart';
+import 'package:omnisell_worksportal/presentation/edit_profile_screen/view/edit_profile_screen.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/view/widgets/task_detail_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -92,15 +93,62 @@ class _HomeScreenState extends State<HomeScreen>
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout_outlined,
-                size: 20, color: Colors.black),
-            onPressed: showLogoutConfirmation,
+          Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+            child: PopupMenuButton<String>(
+              color: Colors.teal[50],
+              icon: const Icon(Icons.person_2_rounded),
+              tooltip: "Profile",
+              onSelected: (String result) {
+                switch (result) {
+                  case 'Profile':
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditProfileScreen(),
+                        ));
+                    break;
+                  case 'Logout':
+                    showLogoutConfirmation();
+                    break;
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                    value: 'Profile',
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.edit,
+                          size: 18,
+                          color: Colors.black,
+                        ),
+                        SizedBox(width: size.width * .03),
+                        Text('Profile',
+                            style: GLTextStyles.cabinStyle(size: 14)),
+                      ],
+                    )),
+                PopupMenuItem<String>(
+                    value: 'Logout',
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.logout,
+                          size: 18,
+                          color: Colors.black,
+                        ),
+                        SizedBox(width: size.width * .03),
+                        Text('Logout',
+                            style: GLTextStyles.cabinStyle(size: 14)),
+                      ],
+                    )),
+              ],
+            ),
           ),
         ],
         bottom: TabBar(
           enableFeedback: false,
-          indicatorColor: const Color.fromARGB(255, 46, 146, 157) ,
+          indicatorColor: const Color.fromARGB(255, 46, 146, 157),
           isScrollable: true,
           controller: tabController,
           labelColor: Colors.black,
@@ -283,42 +331,48 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  void showTaskDetailBottomSheet(BuildContext context, task, Color statusColor) {
-  showModalBottomSheet(
-    context: context,
-    builder: (context) {
-      return TaskDetailBottomSheet(
-        title: task?.title ?? 'No Title',
-        projectName: task?.project?.name ?? 'No Project',
-        assignedBy: task?.assignedByUser?.name ?? 'Unknown',
-        dueDate: formatDate(task?.dueDate),
-        status: task?.status ?? 'Not Started',
-        statusColor: statusColor,
-        priority: getPriorityLabel(task?.priority ?? 0),
-        reviewer: task?.reviewer?.name ?? 'Unknown',
-        description: cleanDescription(task?.description ?? ''),
-        onStatusChange: (String newStatus, String remark, ) async {
-          final int taskId = task?.id ?? 0;
-          try {
-            final homeController = Provider.of<HomeController>(context, listen: false);
-            await homeController.changeStatus(context, taskId, newStatus, remark);
-            await homeController.fetchTasksByStatus(context, widget.statusFilter ?? '');
+  void showTaskDetailBottomSheet(
+      BuildContext context, task, Color statusColor) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return TaskDetailBottomSheet(
+          title: task?.title ?? 'No Title',
+          projectName: task?.project?.name ?? 'No Project',
+          assignedBy: task?.assignedByUser?.name ?? 'Unknown',
+          dueDate: formatDate(task?.dueDate),
+          status: task?.status ?? 'Not Started',
+          statusColor: statusColor,
+          priority: getPriorityLabel(task?.priority ?? 0),
+          reviewer: task?.reviewer?.name ?? 'Unknown',
+          description: cleanDescription(task?.description ?? ''),
+          onStatusChange: (
+            String newStatus,
+            String remark,
+          ) async {
+            final int taskId = task?.id ?? 0;
+            try {
+              final homeController =
+                  Provider.of<HomeController>(context, listen: false);
+              await homeController.changeStatus(
+                  context, taskId, newStatus, remark);
+              await homeController.fetchTasksByStatus(
+                  context, widget.statusFilter ?? '');
+              setState(() {});
+              Navigator.pop(context);
+              fetchData();
+            } catch (e) {
+              log("Error changing status: $e");
+            }
             setState(() {});
-            Navigator.pop(context);
-            fetchData();
-          } catch (e) {
-            log("Error changing status: $e");
-          }
-          setState(() {});
-        },
-      );
-    },
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-    ),
-  );
-}
-
+          },
+        );
+      },
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+      ),
+    );
+  }
 
   String formatDate(DateTime? dueDate) {
     return dueDate != null

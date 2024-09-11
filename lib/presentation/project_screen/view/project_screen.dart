@@ -42,19 +42,17 @@ class _ProjectScreenState extends State<ProjectScreen> {
     super.dispose();
   }
 
-  void fetchData() async {
-    await Provider.of<ProjectController>(context, listen: false)
-        .fetchProjects(context);
-    setState(() {});
-  }
+ void fetchData() async {
+  final projectController = Provider.of<ProjectController>(context, listen: false);
+  await projectController.fetchProjects(context);
+}
 
   void onScroll() {
-    if (scrollController.position.pixels ==
-        scrollController.position.maxScrollExtent) {
-      Provider.of<ProjectController>(context, listen: false)
-          .fetchMoreProjects(context);
-    }
+  if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+    final projectController = Provider.of<ProjectController>(context, listen: false);
+    projectController.fetchMoreProjects(context);
   }
+}
 
   @override
   Widget build(BuildContext context) {

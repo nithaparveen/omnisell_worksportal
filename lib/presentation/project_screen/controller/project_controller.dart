@@ -27,23 +27,28 @@ class ProjectController extends ChangeNotifier {
   }
 
   Future<void> fetchMoreProjects(BuildContext context) async {
-    if (isMoreLoading) return;
+    if (isMoreLoading) return; // Prevent multiple simultaneous requests
     isMoreLoading = true;
     notifyListeners();
-
-    currentPage += 1;
-    final value = await ProjectService.fetchMoreData(page: currentPage);
-
-    if (value != null && value["status"] == "success") {
-      final moreProjects = ProjectModel.fromJson(value);
-
-      projectModel.data?.data?.addAll(moreProjects.data?.data ?? []);
-    } else {
-      AppUtils.oneTimeSnackBar("Unable to fetch more data",
-          context: context, bgColor: ColorTheme.red);
+    try {
+      currentPage++; // Increment the page number
+      final value = await ProjectService.fetchMoreData(page: currentPage);
+      if (value != null && value["status"] == "success") {
+        final moreProjects = ProjectModel.fromJson(value);
+        // Append the new projects to the existing list
+        projectModel.data?.data?.addAll(moreProjects.data?.data ?? []);
+      } else {
+        // Handle error case (e.g., show a snackbar)
+        AppUtils.oneTimeSnackBar("Unable to fetch more data",
+            context: context, bgColor: ColorTheme.red);
+      }
+    } catch (error) {
+      // Handle exceptions (e.g., network errors)
+      print("Error fetching more projects: $error");
+      // You might want to show an error message to the user here as well.
+    } finally {
+      isMoreLoading = false;
+      notifyListeners();
     }
-
-    isMoreLoading = false;
-    notifyListeners();
   }
 }
