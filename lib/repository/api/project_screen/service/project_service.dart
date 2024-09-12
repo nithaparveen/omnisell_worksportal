@@ -4,11 +4,11 @@ import '../../../../core/utils/app_utils.dart';
 import '../../../helper/api_helper.dart';
 
 class ProjectService {
-  static Future<dynamic> fetchProjects() async {
+  static Future<dynamic> fetchProjects({required int page}) async {
     log("ProjectService -> fetchProjects()");
     try {
       var decodedData = await ApiHelper.getData(
-        endPoint: "projects",
+        endPoint: "projects?page=$page",
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData;

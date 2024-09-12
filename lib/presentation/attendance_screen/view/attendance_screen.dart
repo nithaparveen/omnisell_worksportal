@@ -52,9 +52,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     }
   }
 
-  Future<void> _selectDateRange(BuildContext context) async {
+  Future<void> selectDateRange(BuildContext context) async {
     final picked = await showDateRangePicker(
       context: context,
+      
       firstDate: DateTime(2020),
       lastDate: DateTime(2101),
       initialDateRange: fromDate != null && toDate != null
@@ -122,7 +123,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         Color(0xff468585),
                       ),
                     ),
-                    onPressed: () => _selectDateRange(context),
+                    onPressed: () => selectDateRange(context),
                     child: Text(
                       'Select Date Range',
                       style: GLTextStyles.cabinStyle(

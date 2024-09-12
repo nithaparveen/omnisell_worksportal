@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_worksportal/core/constants/colors.dart';
@@ -105,7 +106,9 @@ class _HomeScreenState extends State<HomeScreen>
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProfileScreen(userId: widget.userId,),
+                          builder: (context) => ProfileScreen(
+                            userId: widget.userId,
+                          ),
                         ));
                     break;
                   case 'Logout':
@@ -147,11 +150,11 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ],
         bottom: TabBar(
-          enableFeedback: false,
           indicatorColor: const Color.fromARGB(255, 46, 146, 157),
           isScrollable: true,
           controller: tabController,
           labelColor: Colors.black,
+          tabAlignment: TabAlignment.start,
           tabs: [
             Tab(
               child: Text(
@@ -420,6 +423,7 @@ class _HomeScreenState extends State<HomeScreen>
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
+          surfaceTintColor: Colors.white,
           title: Text(
             'Confirm Logout',
             style: GLTextStyles.cabinStyle(size: 18),
@@ -427,15 +431,31 @@ class _HomeScreenState extends State<HomeScreen>
           content: const Text('Are you sure you want to log out?'),
           actions: [
             TextButton(
+              style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(Colors.white)),
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: GLTextStyles.cabinStyle(
+                  size: 14,
+                  color: const Color(0xff468585),
+                  weight: FontWeight.w500,
+                ),
+              ),
             ),
             TextButton(
+              style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(Color(0xff468585))),
               onPressed: () {
                 Navigator.of(context).pop();
                 logout(context);
               },
-              child: const Text('Logout'),
+              child: Text('Logout',
+                  style: GLTextStyles.cabinStyle(
+                    size: 14,
+                    color: Colors.white,
+                    weight: FontWeight.w500,
+                  )),
             ),
           ],
         );
