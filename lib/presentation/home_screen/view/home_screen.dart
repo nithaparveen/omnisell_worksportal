@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_worksportal/core/constants/colors.dart';
-import 'package:omnisell_worksportal/presentation/edit_profile_screen/view/edit_profile_screen.dart';
+import 'package:omnisell_worksportal/presentation/profile_screen/view/profile_screen.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/view/widgets/task_detail_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen>
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => EditProfileScreen(),
+                          builder: (context) => ProfileScreen(userId: widget.userId,),
                         ));
                     break;
                   case 'Logout':
@@ -119,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen>
                     child: Row(
                       children: [
                         const Icon(
-                          Icons.edit,
+                          Icons.person,
                           size: 18,
                           color: Colors.black,
                         ),
@@ -156,31 +156,31 @@ class _HomeScreenState extends State<HomeScreen>
             Tab(
               child: Text(
                 "Not Started",
-                style: GLTextStyles.cabinStyle(size: 11),
+                style: GLTextStyles.cabinStyle(size: 12),
               ),
             ),
             Tab(
               child: Text(
                 "In Progress",
-                style: GLTextStyles.cabinStyle(size: 11),
+                style: GLTextStyles.cabinStyle(size: 12),
               ),
             ),
             Tab(
               child: Text(
                 "Review Pending",
-                style: GLTextStyles.cabinStyle(size: 11),
+                style: GLTextStyles.cabinStyle(size: 12),
               ),
             ),
             Tab(
               child: Text(
                 "Review Failed",
-                style: GLTextStyles.cabinStyle(size: 11),
+                style: GLTextStyles.cabinStyle(size: 12),
               ),
             ),
             Tab(
               child: Text(
                 "Completed",
-                style: GLTextStyles.cabinStyle(size: 11),
+                style: GLTextStyles.cabinStyle(size: 12),
               ),
             ),
           ],
