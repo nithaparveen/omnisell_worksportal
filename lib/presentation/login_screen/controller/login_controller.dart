@@ -31,7 +31,7 @@ class LoginController extends ChangeNotifier {
             MaterialPageRoute(
                 builder: (context) => StatusNavigationBar(
                       userId: userId,
-                    )),
+                    ),),
             (route) => false);
       } else {
         AppUtils.oneTimeSnackBar("Password mismatch", context: context, bgColor: ColorTheme.red);

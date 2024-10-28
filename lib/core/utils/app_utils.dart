@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -57,5 +58,30 @@ class AppUtils {
             : null,
       ),
     );
+  }
+   static showFlushbar({
+    required BuildContext context,
+    required String message,
+    Color backgroundColor = const Color(0xFFE0E0E0),
+    Color messageColor = const Color(0xFF000000),
+    IconData icon = Icons.done_outline,
+    Color iconColor = const Color(0xFF4CAF50),
+    double widthFactor = 0.55,
+    Duration duration = const Duration(seconds: 3),
+    FlushbarPosition flushbarPosition = FlushbarPosition.TOP,
+  }) {
+    return Flushbar(
+      maxWidth: MediaQuery.of(context).size.width * widthFactor,
+      backgroundColor: backgroundColor,
+      messageColor: messageColor,
+      icon: Icon(
+        icon,
+        color: iconColor,
+        size: 20,
+      ),
+      message: message,
+      duration: duration,
+      flushbarPosition: flushbarPosition,
+    ).show(context);
   }
 }

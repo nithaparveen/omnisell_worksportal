@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 25, right: 25, top: 15),
+          padding: const EdgeInsets.only(left: 30, right: 30, top: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
