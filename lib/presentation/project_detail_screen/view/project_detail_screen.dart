@@ -3,6 +3,7 @@ import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/presentation/project_detail_screen/view/widgets/activities_screen.dart';
 import 'package:omnisell_worksportal/presentation/project_detail_screen/view/widgets/detail_screen.dart';
 import 'package:omnisell_worksportal/presentation/project_detail_screen/view/widgets/members_screen.dart';
+import 'package:omnisell_worksportal/presentation/project_detail_screen/view/widgets/sprint_screen.dart';
 import 'package:omnisell_worksportal/presentation/project_detail_screen/view/widgets/tasks_screen.dart';
 
 class ProjectDetailScreen extends StatefulWidget {
@@ -26,7 +27,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 4, vsync: this);
+    tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -68,6 +69,8 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
         automaticallyImplyLeading: false,
         forceMaterialTransparency: true,
         bottom: TabBar(
+          tabAlignment: TabAlignment.center,
+          isScrollable: true,
           controller: tabController,
           labelColor: Colors.black,
           indicatorColor: const Color.fromARGB(255, 46, 146, 157),
@@ -82,6 +85,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
             Tab(
                 child:
                     Text("Members", style: GLTextStyles.cabinStyle(size: 12))),
+            Tab(
+                child:
+                    Text("Sprints", style: GLTextStyles.cabinStyle(size: 12))),
           ],
         ),
       ),
@@ -92,6 +98,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
           TasksScreen(projectId: widget.projectId),
           ActivitiesScreen(projectId: widget.projectId, userId: widget.userId),
           MembersScreen(projectId: widget.projectId),
+          SprintsScreen(projectId: widget.projectId),
         ],
       ),
     );

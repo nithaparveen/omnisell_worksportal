@@ -59,7 +59,7 @@ class _StatusNavigationBarState extends State<StatusNavigationBar> {
     return [
       PersistentBottomNavBarItem(
         icon: const Icon(
-          Icons.dashboard,
+          Icons.workspaces_rounded,
           size: 18,
         ),
         title: "Work Board",
@@ -82,7 +82,7 @@ class _StatusNavigationBarState extends State<StatusNavigationBar> {
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
-        icon: const Icon(Icons.note, size: 18),
+        icon: const Icon(Icons.dashboard_customize_rounded, size: 18),
         title: "Dashboard",
         textStyle: GLTextStyles.cabinStyle(size: 14, weight: FontWeight.w500),
         activeColorPrimary: const Color(0xff2c74a4),

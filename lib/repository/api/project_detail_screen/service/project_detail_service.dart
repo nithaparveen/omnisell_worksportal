@@ -59,4 +59,29 @@ class ProjectDetailsService {
     }
     return {};
   }
+
+  static Future<dynamic> fetchSprints(projectId) async {
+    log("ProjectDetailsService -> fetchSprints()");
+    try {
+      var decodedData = await ApiHelper.getData(
+        endPoint: "project-sprint/view?project_id=$projectId",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+    return {};
+  }
+
+  static Future<dynamic> createSprint(
+      name, description, projectId, startDate, duedate, expHours) async {
+    log("ProjectDetailsService -> createSprint()");
+    var decodedData = await ApiHelper.postData(
+      endPoint:
+          "project-sprint/create?project_id=$projectId&name=$name&description=$description&start_date=$startDate&due_date=$duedate&expected_hours=$expHours",
+      header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+    );
+    return decodedData;
+  }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:omnisell_worksportal/core/constants/colors.dart';
 import 'package:omnisell_worksportal/global_widget/global_richtext.dart';
 import 'package:omnisell_worksportal/presentation/project_detail_screen/controller/project_detail_controller.dart';
 import 'package:provider/provider.dart';
@@ -48,11 +50,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
       }
 
       if (controller.isLoading) {
-        return const Center(
-          child: CircularProgressIndicator(
-            backgroundColor: Colors.transparent,
-            color: Color.fromARGB(255, 46, 146, 157),
-          ),
+        return  Center(
+          child: LoadingAnimationWidget.staggeredDotsWave(
+           
+              color: ColorTheme.spider,
+              size: 30,
+            ),
         );
       }
 

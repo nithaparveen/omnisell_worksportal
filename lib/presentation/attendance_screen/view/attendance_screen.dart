@@ -2,7 +2,9 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:omnisell_worksportal/app_config/app_config.dart';
+import 'package:omnisell_worksportal/core/constants/colors.dart';
 import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/presentation/attendance_screen/controller/attendance_controller.dart';
 import 'package:omnisell_worksportal/presentation/attendance_screen/view/widgets/attendence_table.dart';
@@ -55,7 +57,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Future<void> selectDateRange(BuildContext context) async {
     final picked = await showDateRangePicker(
       context: context,
-      
       firstDate: DateTime(2020),
       lastDate: DateTime(2101),
       initialDateRange: fromDate != null && toDate != null
@@ -140,16 +141,17 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     ),
                   SizedBox(height: size.width * .02),
                   controller.isLoading
-                      ? const Center(
-                          child: CircularProgressIndicator(
-                            backgroundColor: Colors.transparent,
-                            color: Color.fromARGB(255, 46, 146, 157),
+                      ? Center(
+                          child: LoadingAnimationWidget.staggeredDotsWave(
+                           
+                            color: ColorTheme.spider,
+                            size: 30,
                           ),
-                        ) : AttendanceTableRefactored(
-                              size: size,
-                              attendanceData:
-                                  controller.attendanceModel.data ?? [],
-                            ),
+                        )
+                      : AttendanceTableRefactored(
+                          size: size,
+                          attendanceData: controller.attendanceModel.data ?? [],
+                        ),
                   SizedBox(height: size.width * .04),
                 ],
               ),

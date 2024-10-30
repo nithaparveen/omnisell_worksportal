@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:omnisell_worksportal/app_config/app_config.dart';
+import 'package:omnisell_worksportal/core/constants/colors.dart';
 import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/presentation/project_detail_screen/view/project_detail_screen.dart';
 import 'package:omnisell_worksportal/presentation/project_screen/controller/project_controller.dart';
@@ -42,17 +44,20 @@ class _ProjectScreenState extends State<ProjectScreen> {
     super.dispose();
   }
 
- void fetchData() async {
-  final projectController = Provider.of<ProjectController>(context, listen: false);
-  await projectController.fetchProjects(context);
-}
+  void fetchData() async {
+    final projectController =
+        Provider.of<ProjectController>(context, listen: false);
+    await projectController.fetchProjects(context);
+  }
 
   void onScroll() {
-  if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
-    final projectController = Provider.of<ProjectController>(context, listen: false);
-    projectController.fetchMoreProjects(context);
+    if (scrollController.position.pixels ==
+        scrollController.position.maxScrollExtent) {
+      final projectController =
+          Provider.of<ProjectController>(context, listen: false);
+      projectController.fetchMoreProjects(context);
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -91,10 +96,10 @@ class _ProjectScreenState extends State<ProjectScreen> {
       ),
       body: Consumer<ProjectController>(builder: (context, controller, _) {
         if (controller.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.transparent,
-              color: Color.fromARGB(255, 46, 146, 157),
+          return Center(
+            child: LoadingAnimationWidget.staggeredDotsWave(
+              color: ColorTheme.spider,
+              size: 30,
             ),
           );
         }
@@ -122,12 +127,11 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 itemBuilder: (context, index) {
                   if (index == controller.projectModel.data?.data?.length &&
                       controller.isMoreLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.transparent,
-                        color: Color.fromARGB(255, 46, 146, 157),
-                      ),
-                    );
+                    return Center(
+                        child: LoadingAnimationWidget.staggeredDotsWave(
+                      color: ColorTheme.spider,
+                      size: 30,
+                    ));
                   }
                   final project = controller.projectModel.data?.data?[index];
 
