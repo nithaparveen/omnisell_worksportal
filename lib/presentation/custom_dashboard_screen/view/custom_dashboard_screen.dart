@@ -5,7 +5,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:omnisell_worksportal/core/constants/colors.dart';
 import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/core/utils/app_utils.dart';
-import 'package:omnisell_worksportal/presentation/card_screen/view/card_screen.dart';
+import 'package:omnisell_worksportal/presentation/custom_dashboard_screen/view/widgets/card_screen.dart';
 import 'package:omnisell_worksportal/presentation/custom_dashboard_screen/controller/custom_dashboard_controller.dart';
 import 'package:provider/provider.dart';
 
@@ -195,7 +195,6 @@ class _CustomDashboardScreenState extends State<CustomDashboardScreen> {
           if (controller.isLoading) {
             return Center(
               child: LoadingAnimationWidget.staggeredDotsWave(
-                
                 color: ColorTheme.spider,
                 size: 30,
               ),
@@ -230,7 +229,10 @@ class _CustomDashboardScreenState extends State<CustomDashboardScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CardScreen(),
+                            builder: (context) => CardScreen(
+                              dashboardId:
+                                  controller.customListModel.data?[index].id ?? 0
+                            ),
                           ));
                     },
                     child: Container(

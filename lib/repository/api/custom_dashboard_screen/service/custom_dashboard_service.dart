@@ -7,12 +7,12 @@ class CustomDashboardService {
   static Future<dynamic> createDashboard(
       name, description, userId, date) async {
     log("CustomDashboardService -> createDashboard()");
-      var decodedData = await ApiHelper.postData(
-        endPoint:
-            "custom/store?dashboard_name=$name&description=$description&owner_user_id=$userId&create_date=$date",
-        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
-      );
-      return decodedData;
+    var decodedData = await ApiHelper.postData(
+      endPoint:
+          "custom/store?dashboard_name=$name&description=$description&owner_user_id=$userId&create_date=$date",
+      header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+    );
+    return decodedData;
   }
 
   static Future<dynamic> fetchDashboards() async {
@@ -27,5 +27,28 @@ class CustomDashboardService {
       log("$e");
     }
     return {};
+  }
+  static Future<dynamic> fetchCards(dashboardId) async {
+    log("CustomDashboardService -> fetchCards()");
+    try {
+      var decodedData = await ApiHelper.getData(
+        endPoint: "custom-card/list?dashboard_id=$dashboardId",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+    return {};
+  }
+
+  static Future<dynamic> createCard(name, description, userId, date) async {
+    log("CustomDashboardService -> createCard()");
+    var decodedData = await ApiHelper.postData(
+      endPoint:
+          "custom/store?dashboard_name=$name&description=$description&owner_user_id=$userId&create_date=$date",
+      header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+    );
+    return decodedData;
   }
 }
