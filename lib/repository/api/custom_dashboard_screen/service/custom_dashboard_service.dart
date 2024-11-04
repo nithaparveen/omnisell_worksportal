@@ -51,4 +51,13 @@ class CustomDashboardService {
     );
     return decodedData;
   }
+  static Future<dynamic> deleteCard(cardId) async {
+    log("CustomDashboardService -> deleteCard()");
+    var decodedData = await ApiHelper.postData(
+      endPoint:
+          "custom-card/delete?id=$cardId",
+      header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+    );
+    return decodedData;
+  }
 }

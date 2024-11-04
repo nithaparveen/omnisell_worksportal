@@ -46,7 +46,7 @@ class CustomDashboardController extends ChangeNotifier {
     });
   }
 
-    Future<void> fetchCards(BuildContext context,dashboardId) async {
+  Future<void> fetchCards(BuildContext context, dashboardId) async {
     isCardLoading = true;
     cardListModel = CardListModel();
     notifyListeners();
@@ -66,9 +66,22 @@ class CustomDashboardController extends ChangeNotifier {
 
   createCard(name, description, userId, date, context) async {
     log("CustomDashboardController -> createCard()");
-    await CustomDashboardService.createDashboard(
-            name, description, userId, date)
+    await CustomDashboardService.createCard(name, description, userId, date)
         .then((value) {
+      if (value["data"] != null) {
+        AppUtils.oneTimeSnackBar(value["message"],
+            context: context, textStyle: TextStyle(fontSize: 18));
+        fetchDashboards(context);
+      } else {
+        AppUtils.oneTimeSnackBar(value["message"],
+            context: context, bgColor: Colors.redAccent);
+      }
+    });
+  }
+
+  deleteCard(cardId, context) async {
+    log("CustomDashboardController -> deleteCard()");
+    await CustomDashboardService.deleteCard(cardId).then((value) {
       if (value["data"] != null) {
         AppUtils.oneTimeSnackBar(value["message"],
             context: context, textStyle: TextStyle(fontSize: 18));

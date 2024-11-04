@@ -7,6 +7,7 @@ import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/core/utils/app_utils.dart';
 import 'package:omnisell_worksportal/presentation/custom_dashboard_screen/controller/custom_dashboard_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class CardScreen extends StatefulWidget {
   const CardScreen({super.key, this.dashboardId});
@@ -189,7 +190,7 @@ class _CardScreenState extends State<CardScreen> {
                 ),
               );
             }
-            
+
             if (controller.cardListModel.data == null ||
                 controller.cardListModel.data!.isEmpty) {
               return Center(
@@ -205,99 +206,198 @@ class _CardScreenState extends State<CardScreen> {
                 padding: const EdgeInsets.all(10),
                 child: ListView.separated(
                   itemBuilder: (context, index) {
-                    return Card(
-                      surfaceTintColor: ColorTheme.white,
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 18, right: 18, top: 12, bottom: 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Card type : ",
-                                style: GLTextStyles.openSans(
-                                    size: 12,
-                                    weight: FontWeight.w400,
-                                    color: Colors.grey)),
-                            Text(
-                                controller
-                                        .cardListModel.data?[index].cardName ??
-                                    'Card Name',
-                                style: GLTextStyles.openSans(
-                                    size: 18, weight: FontWeight.w500)),
-                            Text(
-                                controller.cardListModel.data?[index]
-                                        .cardDescription ??
-                                    'Description',
-                                style: GLTextStyles.openSans(
-                                    size: 14,
-                                    weight: FontWeight.w500,
-                                    color: Colors.grey)),
-                            SizedBox(height: size.width * .005),
-                            const Divider(thickness: .25),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("Created by",
-                                        style: GLTextStyles.openSans(
-                                            size: 11,
-                                            weight: FontWeight.w400,
-                                            color: Colors.grey)),
-                                    Text(
-                                      "user",
-                                      style: GLTextStyles.openSans(
-                                          size: 12,
-                                          weight: FontWeight.w400,
-                                          color: Colors.black),
+                    return Slidable(
+                      key: ValueKey(controller.cardListModel.data?[index].id),
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            onPressed: (context) {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    surfaceTintColor: ColorTheme.white,
+                                    title: Text(
+                                      'Confirm Delete',
+                                      style: GLTextStyles.cabinStyle(
+                                        color: ColorTheme.spider,
+                                        size: 16,
+                                        weight: FontWeight.w500,
+                                      ),
                                     ),
-                                    if (controller.customListModel.data?[index]
-                                            .createDate !=
-                                        null)
-                                      Text("Created date",
+                                    content: Text(
+                                      'Are you sure you want to delete?',
+                                      style: GLTextStyles.cabinStyle(
+                                        color: ColorTheme.spider,
+                                        size: 14,
+                                        weight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        style: const ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStatePropertyAll(
+                                                    Colors.white)),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                        child: Text(
+                                          'Cancel',
+                                          style: GLTextStyles.cabinStyle(
+                                            size: 14,
+                                            color: const Color(0xff468585),
+                                            weight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        style: const ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStatePropertyAll(
+                                                    Color(0xff468585))),
+                                        onPressed: () async {
+                                          controller.deleteCard(
+                                              controller
+                                                  .cardListModel.data?[index].id
+                                                  .toString(),
+                                              context);
+                                          Navigator.of(context).pop();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              duration: const Duration(
+                                                  seconds: 1, milliseconds: 50),
+                                              content: Text(
+                                                "Card successfully deleted",
+                                                style: GLTextStyles.cabinStyle(
+                                                    color: ColorTheme.white,
+                                                    weight: FontWeight.w500,
+                                                    size: 14),
+                                              ),
+                                              backgroundColor:
+                                                  const Color.fromARGB(
+                                                      255, 97, 182, 86),
+                                            ),
+                                          );
+                                          fetchData();
+                                        },
+                                        child: Text('Confirm',
+                                            style: GLTextStyles.cabinStyle(
+                                              size: 14,
+                                              color: Colors.white,
+                                              weight: FontWeight.w500,
+                                            )),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            backgroundColor: ColorTheme.white,
+                            foregroundColor: ColorTheme.spider,
+                            icon: CupertinoIcons.delete_solid,
+                          ),
+                        ],
+                      ),
+                      child: Card(
+                        surfaceTintColor: ColorTheme.white,
+                        elevation: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 18, right: 18, top: 12, bottom: 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Card type : ",
+                                  style: GLTextStyles.openSans(
+                                      size: 12,
+                                      weight: FontWeight.w400,
+                                      color: Colors.grey)),
+                              Text(
+                                  controller.cardListModel.data?[index]
+                                          .cardName ??
+                                      'Card Name',
+                                  style: GLTextStyles.openSans(
+                                      size: 18, weight: FontWeight.w500)),
+                              Text(
+                                  controller.cardListModel.data?[index]
+                                          .cardDescription ??
+                                      'Description',
+                                  style: GLTextStyles.openSans(
+                                      size: 14,
+                                      weight: FontWeight.w500,
+                                      color: Colors.grey)),
+                              SizedBox(height: size.width * .005),
+                              const Divider(thickness: .25),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Created by",
                                           style: GLTextStyles.openSans(
                                               size: 11,
                                               weight: FontWeight.w400,
                                               color: Colors.grey)),
-                                    if (controller.customListModel.data?[index]
-                                            .createDate !=
-                                        null)
                                       Text(
-                                        DateFormat('dd/MM/yyyy').format(
-                                            controller
-                                                .customListModel
-                                                .data![index]
-                                                .createDate as DateTime),
+                                        "user",
                                         style: GLTextStyles.openSans(
                                             size: 12,
                                             weight: FontWeight.w400,
                                             color: Colors.black),
                                       ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("Priority",
+                                      if (controller.customListModel
+                                              .data?[index].createDate !=
+                                          null)
+                                        Text("Created date",
+                                            style: GLTextStyles.openSans(
+                                                size: 11,
+                                                weight: FontWeight.w400,
+                                                color: Colors.grey)),
+                                      if (controller.customListModel
+                                              .data?[index].createDate !=
+                                          null)
+                                        Text(
+                                          DateFormat('dd/MM/yyyy').format(
+                                              controller
+                                                  .customListModel
+                                                  .data![index]
+                                                  .createDate as DateTime),
+                                          style: GLTextStyles.openSans(
+                                              size: 12,
+                                              weight: FontWeight.w400,
+                                              color: Colors.black),
+                                        ),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Priority",
+                                          style: GLTextStyles.openSans(
+                                              size: 11,
+                                              weight: FontWeight.w400,
+                                              color: Colors.grey)),
+                                      Text(
+                                        "Medium",
                                         style: GLTextStyles.openSans(
-                                            size: 11,
+                                            size: 12,
                                             weight: FontWeight.w400,
-                                            color: Colors.grey)),
-                                    Text(
-                                      "Medium",
-                                      style: GLTextStyles.openSans(
-                                          size: 12,
-                                          weight: FontWeight.w400,
-                                          color: Colors.black),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
+                                            color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
