@@ -29,21 +29,29 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 5, vsync: this)
-      ..addListener(() {
-        if (tabController.indexIsChanging) {
-          fetchData();
-        }
-      });
+    tabController = TabController(length: 5, vsync: this);
+
+    tabController.addListener(() {
+      if (!tabController.indexIsChanging &&
+          tabController.index == tabController.animation!.value) {
+        fetchData();
+      }
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final homeController =
           Provider.of<HomeController>(context, listen: false);
       homeController.setUserId(widget.userId);
+
+      if (widget.statusFilter != null) {
+        tabController.animateTo(getTabIndexFromStatus(widget.statusFilter!));
+      }
+
       fetchData();
     });
   }
 
-  void fetchData() async {
+  Future<void> fetchData() async {
     final homeController = Provider.of<HomeController>(context, listen: false);
     String statusFilter = getStatusFilter();
     await homeController.fetchTasksByStatus(context, statusFilter);
@@ -67,6 +75,23 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
+  int getTabIndexFromStatus(String status) {
+    switch (status) {
+      case 'Not Started':
+        return 0;
+      case 'In Progress':
+        return 1;
+      case 'Review Pending':
+        return 2;
+      case 'Review Failed':
+        return 3;
+      case 'Completed':
+        return 4;
+      default:
+        return 0;
+    }
+  }
+
   final Map<String, Color> statusColors = {
     'Not Started': Colors.grey,
     'In Progress': Colors.blue,
@@ -74,6 +99,12 @@ class _HomeScreenState extends State<HomeScreen>
     'Review Failed': Colors.red,
     'Completed': Colors.green,
   };
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,187 +181,154 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ],
         bottom: TabBar(
-          indicatorColor: const Color.fromARGB(255, 46, 146, 157),
-          isScrollable: true,
           controller: tabController,
+          isScrollable: true,
+          indicatorColor: const Color.fromARGB(255, 46, 146, 157),
           labelColor: Colors.black,
-          tabAlignment: TabAlignment.start,
-          tabs: [
-            Tab(
-              child: Text(
-                "Not Started",
-                style: GLTextStyles.cabinStyle(size: 12),
-              ),
-            ),
-            Tab(
-              child: Text(
-                "In Progress",
-                style: GLTextStyles.cabinStyle(size: 12),
-              ),
-            ),
-            Tab(
-              child: Text(
-                "Review Pending",
-                style: GLTextStyles.cabinStyle(size: 12),
-              ),
-            ),
-            Tab(
-              child: Text(
-                "Review Failed",
-                style: GLTextStyles.cabinStyle(size: 12),
-              ),
-            ),
-            Tab(
-              child: Text(
-                "Completed",
-                style: GLTextStyles.cabinStyle(size: 12),
-              ),
-            ),
+          labelStyle: const TextStyle(fontSize: 12),
+          unselectedLabelStyle: const TextStyle(fontSize: 10),
+          tabs: const [
+            Tab(text: "Not Started"),
+            Tab(text: "In Progress"),
+            Tab(text: "Review Pending"),
+            Tab(text: "Review Failed"),
+            Tab(text: "Completed"),
           ],
-          onTap: (index) {
-            fetchData();
-          },
         ),
-        automaticallyImplyLeading: false,
-        forceMaterialTransparency: true,
       ),
-      body: Consumer<HomeController>(
-        builder: (context, homeController, child) {
-          return IndexedStack(
-            index: tabController.index,
-            children: List.generate(5, (index) {
-              String statusFilter = getStatusFilter();
-              var filteredTasks =
-                  homeController.taskModel.data?.data?.where((task) {
-                        return task.status == statusFilter;
-                      }).toList() ??
-                      [];
+      body: TabBarView(
+        controller: tabController,
+        children: List.generate(5, (index) {
+          String statusFilter = getStatusFilter();
+          var filteredTasks = Provider.of<HomeController>(context)
+                  .taskModel
+                  .data
+                  ?.data
+                  ?.where((task) => task.status == statusFilter)
+                  .toList() ??
+              [];
 
-              if (homeController.isLoading) {
-                return Center(
-                  child: LoadingAnimationWidget.staggeredDotsWave(
-                  
-                    color: ColorTheme.spider,
-                    size: 30,
-                  ),
-                );
-              }
+          if (Provider.of<HomeController>(context).isLoading) {
+            return Center(
+              child: LoadingAnimationWidget.staggeredDotsWave(
+                color: ColorTheme.spider,
+                size: 30,
+              ),
+            );
+          }
 
-              if (filteredTasks.isEmpty) {
-                return Center(
-                    child: Text(
-                  "No tasks available",
-                  style: GLTextStyles.cabinStyle(
-                      size: 16, weight: FontWeight.w400, color: Colors.grey),
-                ));
-              }
+          if (filteredTasks.isEmpty) {
+            return Center(
+              child: Text(
+                "No tasks available",
+                style: GLTextStyles.cabinStyle(
+                    size: 16, weight: FontWeight.w400, color: Colors.grey),
+              ),
+            );
+          }
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: CustomScrollView(
-                  slivers: [
-                    SliverList.separated(
-                      itemCount: filteredTasks.length,
-                      itemBuilder: (context, index) {
-                        var task = filteredTasks[index];
-                        DateTime? dueDate = task.dueDate;
-                        String formattedDate = dueDate != null
-                            ? DateFormat('dd/MM/yyyy').format(dueDate)
-                            : 'No Due Date';
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: CustomScrollView(
+              slivers: [
+                SliverList.separated(
+                  itemCount: filteredTasks.length,
+                  itemBuilder: (context, index) {
+                    var task = filteredTasks[index];
+                    DateTime? dueDate = task.dueDate;
+                    String formattedDate = dueDate != null
+                        ? DateFormat('dd/MM/yyyy').format(dueDate)
+                        : 'No Due Date';
 
-                        String currentStatus = task.status ?? 'Not Started';
-                        Color currentColor =
-                            statusColors[currentStatus] ?? Colors.grey;
-                        return InkWell(
-                          onTap: () => showTaskDetailBottomSheet(
-                              context, task, currentColor),
-                          child: Card(
-                            surfaceTintColor: ColorTheme.white,
-                            elevation: 2,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                    Color currentColor =
+                        statusColors[task.status] ?? Colors.grey;
+
+                    return InkWell(
+                      onTap: () => showTaskDetailBottomSheet(
+                          context, task, currentColor),
+                      child: Card(
+                        surfaceTintColor: ColorTheme.white,
+                        elevation: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(task.title ?? 'No Title',
+                                  style: GLTextStyles.openSans(
+                                      size: 16, weight: FontWeight.w500)),
+                              Text(task.project?.name ?? 'No Project',
+                                  style: GLTextStyles.openSans(
+                                      size: 14,
+                                      weight: FontWeight.w400,
+                                      color: Colors.grey)),
+                              SizedBox(height: size.width * .008),
+                              Row(
                                 children: [
-                                  Text(task.title ?? 'No Title',
+                                  Text("assigned by: ",
                                       style: GLTextStyles.openSans(
-                                          size: 18, weight: FontWeight.w500)),
-                                  Text(task.project?.name ?? 'No Project',
-                                      style: GLTextStyles.openSans(
-                                          size: 16,
+                                          size: 10,
                                           weight: FontWeight.w400,
                                           color: Colors.grey)),
-                                  SizedBox(height: size.width * .008),
-                                  Row(
+                                  Text(task.assignedByUser?.name ?? 'Unknown',
+                                      style: GLTextStyles.openSans(
+                                          size: 11,
+                                          weight: FontWeight.w400,
+                                          color: Colors.black)),
+                                ],
+                              ),
+                              const Divider(thickness: .25),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text("assigned by: ",
+                                      Text("Due date",
                                           style: GLTextStyles.openSans(
-                                              size: 12,
+                                              size: 10,
                                               weight: FontWeight.w400,
                                               color: Colors.grey)),
-                                      Text(
-                                          task.assignedByUser?.name ??
-                                              'Unknown',
+                                      Text(formattedDate,
                                           style: GLTextStyles.openSans(
-                                              size: 13,
+                                              size: 12,
                                               weight: FontWeight.w400,
                                               color: Colors.black)),
                                     ],
                                   ),
-                                  const Divider(thickness: .25),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Due date",
-                                              style: GLTextStyles.openSans(
-                                                  size: 12,
-                                                  weight: FontWeight.w400,
-                                                  color: Colors.grey)),
-                                          Text(formattedDate,
-                                              style: GLTextStyles.openSans(
-                                                  size: 12,
-                                                  weight: FontWeight.w400,
-                                                  color: Colors.black)),
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Status",
-                                              style: GLTextStyles.openSans(
-                                                  size: 12,
-                                                  weight: FontWeight.w400,
-                                                  color: Colors.grey)),
-                                          Text(task.status ?? 'No Status',
-                                              style: GLTextStyles.openSans(
-                                                  size: 12,
-                                                  weight: FontWeight.w400,
-                                                  color: currentColor)),
-                                        ],
-                                      ),
+                                      Text("Status",
+                                          style: GLTextStyles.openSans(
+                                              size: 10,
+                                              weight: FontWeight.w400,
+                                              color: Colors.grey)),
+                                      Text(task.status ?? 'No Status',
+                                          style: GLTextStyles.openSans(
+                                              size: 12,
+                                              weight: FontWeight.w600,
+                                              color: currentColor)),
                                     ],
                                   ),
                                 ],
                               ),
-                            ),
+                            ],
                           ),
-                        );
-                      },
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 5),
-                    ),
-                  ],
+                        ),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 5),
                 ),
-              );
-            }),
+              ],
+            ),
           );
-        },
+        }),
       ),
     );
   }

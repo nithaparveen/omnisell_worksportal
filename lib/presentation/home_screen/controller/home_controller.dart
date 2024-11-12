@@ -10,36 +10,47 @@ import '../../../core/utils/app_utils.dart';
 import 'package:another_flushbar/flushbar.dart';
 
 class HomeController extends ChangeNotifier {
-  TaskModel taskModel = TaskModel();
+   TaskModel taskModel = TaskModel();
   StatusModel statusModel = StatusModel();
   TaskDetailModel taskDetailModel = TaskDetailModel();
-
+  
   bool isLoading = false;
   bool isStatusLoading = false;
-
+  String _currentStatus = '';
+  
   int? userId;
-
+  
   void setUserId(int id) {
     userId = id;
   }
-
+  
   Future<void> fetchTasksByStatus(BuildContext context, String status) async {
+    // Don't reload if the status hasn't changed
+    if (status == _currentStatus && taskModel.data?.data != null) {
+      return;
+    }
+    
     isLoading = true;
     notifyListeners();
-    log("Fetching tasks by status: $status");
-
+    
     try {
       final value = await HomeService.fetchData(userId!, status: status);
       if (value != null && value["status"] == "success") {
-        log("data fetched");
         taskModel = TaskModel.fromJson(value);
+        _currentStatus = status;
       } else {
-        AppUtils.oneTimeSnackBar("Unable to fetch Data",
-            context: context, bgColor: ColorTheme.red);
+        AppUtils.oneTimeSnackBar(
+          "Unable to fetch Data",
+          context: context,
+          bgColor: ColorTheme.red
+        );
       }
     } catch (e) {
-      AppUtils.oneTimeSnackBar("An error occurred",
-          context: context, bgColor: ColorTheme.red);
+      AppUtils.oneTimeSnackBar(
+        "An error occurred",
+        context: context,
+        bgColor: ColorTheme.red
+      );
     } finally {
       isLoading = false;
       notifyListeners();

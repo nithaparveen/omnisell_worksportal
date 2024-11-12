@@ -45,9 +45,11 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   void fetchData() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
     final projectController =
         Provider.of<ProjectController>(context, listen: false);
-    await projectController.fetchProjects(context);
+     projectController.fetchProjects(context);
+        });
   }
 
   void onScroll() {

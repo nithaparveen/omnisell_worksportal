@@ -15,7 +15,9 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
-    fetchData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchData();
+    });
     super.initState();
   }
 
@@ -42,7 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           "Profile",
           style: GLTextStyles.cabinStyle(size: 22),
         ),
-         actions: [
+        actions: [
           IconButton(
             onPressed: fetchData,
             tooltip: "Refresh",
@@ -57,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         forceMaterialTransparency: true,
       ),
       body: Consumer<ProfileController>(builder: (context, controller, _) {
-         if (controller.isLoading) {
+        if (controller.isLoading) {
           return const Center(
             child: CircularProgressIndicator(
               backgroundColor: Colors.transparent,
@@ -74,11 +76,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    labelValueRow("Name:", controller.profileModel.data?.name ?? ""),
-                    labelValueRow("Personal Email:", controller.profileModel.data?.employee?.email ?? ""),
-                    labelValueRow("Personal Phone:", controller.profileModel.data?.username ??  ""),
-                    labelValueRow("Current Address:", controller.profileModel.data?.employee?.address ??  ""),
-                    labelValueRow("Permanent Address:",controller.profileModel.data?.employee?.permanentAddress ??  ""),
+                    labelValueRow(
+                        "Name:", controller.profileModel.data?.name ?? ""),
+                    labelValueRow("Personal Email:",
+                        controller.profileModel.data?.employee?.email ?? ""),
+                    labelValueRow("Personal Phone:",
+                        controller.profileModel.data?.username ?? ""),
+                    labelValueRow("Current Address:",
+                        controller.profileModel.data?.employee?.address ?? ""),
+                    labelValueRow(
+                        "Permanent Address:",
+                        controller.profileModel.data?.employee
+                                ?.permanentAddress ??
+                            ""),
                   ],
                 ),
               ),
@@ -87,9 +97,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    labelValueRow("Office Email:", controller.profileModel.data?.email ??  ""),
-                    labelValueRow("Office Phone:", controller.profileModel.data?.employee?.phoneNumber ??  ""),
-                    labelValueRow("Employee Level:",controller.profileModel.data?.employee?.employeeLevel ??   ""),
+                    labelValueRow("Office Email:",
+                        controller.profileModel.data?.email ?? ""),
+                    labelValueRow(
+                        "Office Phone:",
+                        controller.profileModel.data?.employee?.phoneNumber ??
+                            ""),
+                    labelValueRow(
+                        "Employee Level:",
+                        controller.profileModel.data?.employee?.employeeLevel ??
+                            ""),
                   ],
                 ),
               ),
@@ -138,14 +155,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(label,
               style: GLTextStyles.openSans(
                   size: 14, weight: FontWeight.w400, color: Colors.grey)),
-           Flexible(
-          child: Text(value,
-          textAlign: TextAlign.end,
-              style: GLTextStyles.openSans(
-                  size: 14, weight: FontWeight.w500, color: Colors.black),
-              maxLines: 5, 
-              overflow: TextOverflow.ellipsis),
-        ),
+          Flexible(
+            child: Text(value,
+                textAlign: TextAlign.end,
+                style: GLTextStyles.openSans(
+                    size: 14, weight: FontWeight.w500, color: Colors.black),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis),
+          ),
         ],
       ),
     );
