@@ -63,9 +63,9 @@ class _HomeScreenState extends State<HomeScreen>
       case 0:
         return 'Not Started';
       case 1:
-        return 'In Progress';
+        return 'In progress';
       case 2:
-        return 'Review Pending';
+        return 'Review pending';
       case 3:
         return 'Review Failed';
       case 4:
@@ -79,9 +79,9 @@ class _HomeScreenState extends State<HomeScreen>
     switch (status) {
       case 'Not Started':
         return 0;
-      case 'In Progress':
+      case 'In progress':
         return 1;
-      case 'Review Pending':
+      case 'Review pending':
         return 2;
       case 'Review Failed':
         return 3;
@@ -94,8 +94,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   final Map<String, Color> statusColors = {
     'Not Started': Colors.grey,
-    'In Progress': Colors.blue,
-    'Review Pending': Colors.orange,
+    'In progress': Colors.blue,
+    'Review pending': Colors.orange,
     'Review Failed': Colors.red,
     'Completed': Colors.green,
   };

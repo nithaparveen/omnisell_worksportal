@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:omnisell_worksportal/core/constants/textstyles.dart';
 import 'package:omnisell_worksportal/repository/api/home_screen/model/status_model.dart';
