@@ -5,6 +5,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:omnisell_worksportal/core/constants/colors.dart';
 import 'package:omnisell_worksportal/presentation/profile_screen/view/profile_screen.dart';
 import 'package:omnisell_worksportal/presentation/home_screen/view/widgets/task_detail_bottom_sheet.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../app_config/app_config.dart';
@@ -22,6 +23,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
@@ -29,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+    // addEmailToOneSignal();
     tabController = TabController(length: 5, vsync: this);
 
     tabController.addListener(() {
@@ -48,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen>
       }
 
       fetchData();
+
     });
   }
 
@@ -56,6 +60,16 @@ class _HomeScreenState extends State<HomeScreen>
     String statusFilter = getStatusFilter();
     await homeController.fetchTasksByStatus(context, statusFilter);
   }
+
+// Future<void> addEmailToOneSignal() async {
+//   try {
+//     log("Starting to get OneSignal ID..."); // Debug log 1
+//     String? onesignalId = await OneSignal.User.getOnesignalId();
+//     log("OneSignal ID received: $onesignalId"); // Debug log 2
+//   } catch (e) {
+//     log("Error getting OneSignal ID: $e"); // Error log
+//   }
+// }
 
   String getStatusFilter() {
     int index = tabController.index;

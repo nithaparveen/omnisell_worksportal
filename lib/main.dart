@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:omnisell_worksportal/presentation/attendance_screen/controller/attendance_controller.dart';
 import 'package:omnisell_worksportal/presentation/bottom_navigation_screen/controller/bottom_navigation_controller.dart';
@@ -33,13 +34,38 @@ void main() async {
     ],
     child: MyApp(isLoggedIn: loggedIn, userId: userId),
   ));
-  await initOneSignal();             
+  await initOneSignal();
 }
 
 Future<void> initOneSignal() async {
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
   OneSignal.initialize("19ba2058-3400-4f7a-a3ce-9ebfa69a56c0");
+  OneSignal.login('akhil@spiderworks.in');
   await OneSignal.Notifications.requestPermission(true);
+  String? subscriptionId = await getSubscriptionId();
+  if (subscriptionId != null) {
+    await OneSignal.login(subscriptionId);
+    log("OneSignal Subscription ID: $subscriptionId");
+  }
+}
+
+Future<String?> getSubscriptionId() async {
+  try {
+    // Get the subscription ID from OneSignal
+    final pushSubscription = OneSignal.User.pushSubscription;
+    final id = pushSubscription.id;
+
+    // Store the subscription ID locally if needed
+    if (id != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('onesignal_subscription_id', id);
+    }
+
+    return id;
+  } catch (e) {
+    log("Error getting subscription ID: $e");
+    return null;
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -52,6 +78,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     onClickOneSignal();
+    setupOneSignalClickListener();
+    // log("ID : "+OneSignal.User.pushSubscription.id.toString());
     return MaterialApp(
       theme: ThemeData(
         popupMenuTheme: const PopupMenuThemeData(
@@ -72,6 +100,20 @@ class MyApp extends StatelessWidget {
       navigatorKey.currentState?.push(
         MaterialPageRoute(
             builder: (context) => StatusNavigationBar(userId: userId)),
+      );
+    });
+  }
+
+  void setupOneSignalClickListener() {
+    OneSignal.Notifications.addClickListener((event) {
+      // Handle notification click with subscription ID
+      final subscriptionId = OneSignal.User.pushSubscription.id;
+      log("Notification clicked - Subscription ID: $subscriptionId");
+
+      navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (context) => StatusNavigationBar(userId: userId),
+        ),
       );
     });
   }
